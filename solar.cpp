@@ -77,6 +77,7 @@ static void draw(void) {
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_COLOR_MATERIAL);
 
+  // sun
   push_pop([](void) {
     glColor3f(0.7, 0.5, 0.0);
     glScalef(sx, sy, sz);
@@ -86,46 +87,39 @@ static void draw(void) {
     glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, black);
   });
 
-  glScalef(0.2, 0.2, 0.2);
-
   push_pop([](void) {
     glRotatef(angleMercury, 0.0, 1.0, -0.5);
-    glTranslatef(1.5, 0.0, 0.0);
+    glTranslatef(0.3, 0.0, 0.0);
     glColor3f(1.0, 0.9, 0.0);
-    glScalef(0.08, 0.08, 0.08);
-    glutSolidSphere(1, 50, 50);
+    glutSolidSphere(0.016, 50, 50);
   });
 
   push_pop([](void) {
     glRotatef(angleVenus, 0.0, 1.0, -0.5);
-    glTranslatef(2.0, 0.0, 0.0);
+    glTranslatef(0.4, 0.0, 0.0);
     glColor3f(0.9, 0.1, 0.0);
-    glScalef(0.1, 0.1, 0.1);
-    glutSolidSphere(1, 50, 50);
+    glutSolidSphere(0.02, 50, 50);
   });
 
   push_pop([](void) {
     glRotatef(angleEarth, 0.0, 1.0, -0.5);
-    glTranslatef(2.5, 0.0, 0.0);
+    glTranslatef(0.5, 0.0, 0.0);
     glColor3f(0.0, 0.1, 0.7);
-    glScalef(0.23, 0.23, 0.23);
-    glutSolidSphere(1, 50, 50);
+    glutSolidSphere(0.046, 50, 50);
     // create satelite
     push_pop([](void) {
       glRotatef(angleMoon, 0.0, 0.1, 0.05);
-      glTranslatef(1.3, 0.0, 0.0);
+      glTranslatef(0.0598, 0.0, 0.0);
       glColor3f(1.0, 1.0, 1.0);
-      glScalef(0.5, 0.5, 0.5);
-      glutSolidSphere(0.5, 50, 50);
+      glutSolidSphere(0.023, 50, 50);
     }); // moon made
   });   // earth made
 
   push_pop([](void) {
     glRotatef(angleMars, 0.0, 1.0, -0.5);
-    glTranslatef(-3.0, 0.0, 0.0);
+    glTranslatef(-0.6, 0.0, 0.0);
     glColor3f(0.05, 0.05, 0.01);
-    glScalef(0.17, 0.17, 0.17);
-    glutSolidSphere(1, 50, 50);
+    glutSolidSphere(0.034, 50, 50);
   });
 
   push_pop([](void) {
@@ -133,7 +127,7 @@ static void draw(void) {
     glRotatef(63, 1.0, 0.0, 0.0);
     int div = 90;
     float siz = 2;
-    float scl[4] = {3.3, 3.4, 3.35, 3.2};
+    float scl[4] = {0.66, 0.68, 0.67, 0.64};
     for (int j = 0; j < 4; j++) {
       push_pop([&siz, &scl, j, &div](void) {
         siz -= 0.3;
@@ -153,30 +147,27 @@ static void draw(void) {
 
   push_pop([](void) {
     glRotatef(angleJupiter, 0.0, 1.0, -0.5);
-    glTranslatef(-4.0, 0.0, 0.0);
+    glTranslatef(-0.8, 0.0, 0.0);
     glColor3f(0.4, 0.2, 0.0);
-    glScalef(0.5, 0.5, 0.5);
-    glutSolidSphere(1, 50, 50);
+    glutSolidSphere(0.1, 50, 50);
     push_pop([](void) {
       glRotatef(angleMoon, 1.0, -0.5, 0.0);
-      glTranslatef(0.0, 0, 1.1);
+      glTranslatef(0.0, 0, 0.11);
       glColor3f(1.0, 1.0, 1.0);
-      glScalef(0.1, 0.1, 0.1);
-      glutSolidSphere(0.5, 50, 50);
+      glutSolidSphere(0.005, 50, 50);
     }); // moon made
   });
 
   push_pop([](void) {
     glRotatef(angleSaturn, 0.0, 1.0, -1.0);
-    glTranslatef(-5.0, 0.0, 0.0);
+    glTranslatef(-1.0, 0.0, 0.0);
     glColor3f(0.9, 0.0, 0.0);
-    glScalef(0.4, 0.4, 0.4);
-    glutSolidSphere(1, 50, 50);
+    glutSolidSphere(0.08, 50, 50);
     push_pop([](void) {
       glRotatef(45, 1.0, 0.0, 0.0);
       glPointSize(3);
       glColor3f(5.0, 3.0, 1.0);
-      glScalef(1.2, 1.2, 1.2);
+      glScalef(0.096, 0.096, 0.096);
       glBegin(GL_POINTS);
       double ang1 = 0.0;
       for (int i = 0; i < 50; i++) {
@@ -191,18 +182,16 @@ static void draw(void) {
 
   push_pop([](void) {
     glRotatef(angleUranus, 0.0, 1.0, -0.5);
-    glTranslatef(5.2, 0.0, 0.0);
+    glTranslatef(1.04, 0.0, 0.0);
     glColor3f(0.0, 0.5, 0.9);
-    glScalef(0.23, 0.23, 0.23);
-    glutSolidSphere(1, 50, 50);
+    glutSolidSphere(0.046, 50, 50);
   });
 
   push_pop([](void) {
     glRotatef(angleNeptune, 0.0, 1.0, -0.5);
-    glTranslatef(-5.7, 0.0, 0.0);
+    glTranslatef(-1.14, 0.0, 0.0);
     glColor3f(0.0, 0.0, 0.9);
-    glScalef(0.2, 0.2, 0.2);
-    glutSolidSphere(1, 50, 50);
+    glutSolidSphere(0.04, 50, 50);
   });
 
   glPopMatrix();
