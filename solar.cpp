@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <GL/glew.h>
 #include <GL/glut.h>
 #include <math.h>
 #include <time.h>
@@ -351,13 +352,23 @@ GLuint loadTexture(FIBITMAP *dib1) {
 
   return tex_id;
 }
+void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id,
+                                GLenum severity, GLsizei length,
+                                const GLchar *message, const void *userParam) {
+  fprintf(stderr,
+          "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+          (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity,
+          message);
+}
 
 int main(int argc, char **argv) {
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
   glutInitWindowPosition(0, 0);
   glutCreateWindow("Solar System");
-
+  glewInit();
+  glEnable(GL_DEBUG_OUTPUT);
+  glDebugMessageCallback(MessageCallback, 0);
   FIBITMAP *sun = loadImage("images/sun.jpg");
   sun_tex = loadTexture(sun);
   FreeImage_Unload(sun);
