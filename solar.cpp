@@ -34,25 +34,6 @@ void initLighting() {
   glLightfv(GL_LIGHT7, GL_SPECULAR, qSpec);
   // glMaterialfv(GL_FRONT,GL_DIFFUSE,yellow);
 }
-void myinit() {
-  glClearColor(0.0, 0.0, 0.0, 0.0); // backgroundcolor is green
-  // gluOrtho2D(0,699,0,699);
-  glPointSize(1.0);
-  glLineWidth(2.0);
-}
-
-void background() {
-  glBegin(GL_QUADS);
-  glColor3f(0.0, 0.00, 0.00);
-  glVertex3f(-01.00, 01.00, 1);
-  glColor3f(.20, 0.0, 0.70);
-  glVertex3f(01.00, 1.00, 1);
-  glColor3f(0, 0.0, 0.0);
-  glVertex3f(1.00, -1.00, 1);
-  glColor3f(.70, .10, .20);
-  glVertex3f(-1.00, -1.00, 1);
-  glEnd();
-}
 
 void orbit() {
   glColor3f(0.5, 0.5, 0.5);
@@ -290,10 +271,8 @@ int main(int argc, char **argv) {
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
   glutInitWindowPosition(0, 0);
-  // glutInitWindowSize(700, 700);
   glutCreateWindow("Solar System");
   initLighting();
-  myinit();
   glutDisplayFunc(draw);
   glutReshapeFunc(reshape);
   glutTimerFunc(25, update, 0);
