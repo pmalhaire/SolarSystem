@@ -25,9 +25,9 @@ static GLfloat sc[8] = {0.295, 0.40, 0.50, 0.60, 0.80, 1.0, 1.05, 1.13};
 static double ang = 2 * M_PI / 300;
 static double angular = 2 * M_PI / 50;
 
-static GLdouble eyeX = 2.0, eyeY = 0.0, eyeZ = 20.0, centerX = 0.0,
+static GLdouble eyeX = 0.0, eyeY = 15.0, eyeZ = 15.0, centerX = 0.0,
                 centerY = 0.0, centerZ = 0.0, upX = 0.0, upY = 1.0, upZ = 0.0;
-
+static float angleX = 0.0, angleY = 0.0;
 int width = 700, height = 700;
 
 static void initLighting() {
@@ -208,21 +208,33 @@ static void update_angle(float &angle, const float change) {
   if (angle > 360.0f) {
     angle -= 360.0f;
   }
+  if (angle < 0.0f) {
+    angle += 360.0f;
+  }
 }
 
 static void specialKey(int key, int, int) {
+  const double step = 0.1;
   switch (key) {
   case GLUT_KEY_UP:
-    eyeX += 1.0;
+    update_angle(angleX, step);
+    eyeY = 15.0 * cos(angleX);
+    eyeZ = 15.0 * sin(angleX);
     break;
   case GLUT_KEY_DOWN:
-    eyeX -= 1.0;
+    update_angle(angleX, -step);
+    eyeY = 15.0 * cos(angleX);
+    eyeZ = 15.0 * sin(angleX);
     break;
   case GLUT_KEY_LEFT:
-    eyeY -= 1.0;
+    update_angle(angleY, step);
+    eyeX = 15.0 * cos(angleY);
+    eyeZ = 15.0 * sin(angleY);
     break;
   case GLUT_KEY_RIGHT:
-    eyeY += 1.0;
+    update_angle(angleY, -step);
+    eyeX = 15.0 * cos(angleY);
+    eyeZ = 15.0 * sin(angleY);
   default:
     break;
   }
