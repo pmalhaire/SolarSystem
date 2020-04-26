@@ -3,6 +3,7 @@
 #include <GL/glut.h>
 #include <math.h>
 #include <time.h>
+#include <FreeImage.h>
 #include <functional>
 
 static GLfloat angleMoon = 0.0, angleEarth = 0.0, angleAstroid = 0.0,
@@ -29,6 +30,8 @@ static GLdouble eyeX = 0.0, eyeY = 15.0, eyeZ = 15.0, centerX = 0.0,
                 centerY = 0.0, centerZ = 0.0, upX = 0.0, upY = 1.0, upZ = 0.0;
 static float angleX = 0.0, angleY = 0.0;
 int width = 700, height = 700;
+
+GLuint sun_tex;
 
 static void initLighting() {
   // glMaterialfv(GL_FRONT,GL_AMBIENT,yellow);
@@ -84,12 +87,14 @@ static void draw(void) {
 
   // sun
   push_pop([](void) {
-    glColor3f(0.7, 0.5, 0.0);
     glScalef(sx, sy, sz);
-    glLightfv(GL_LIGHT7, GL_POSITION, qPos);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, yellow);
-    glutSolidSphere(1, 50, 50);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, black);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, sun_tex);
+    GLUquadricObj *quadric = gluNewQuadric();
+    gluQuadricTexture(quadric, true);
+    gluQuadricNormals(quadric, GLU_SMOOTH);
+    gluSphere(quadric, 1, 50, 50);
+    glDisable(GL_TEXTURE_2D);
   });
 
   push_pop([](void) {
@@ -293,11 +298,70 @@ static void reshape(int w, int h) {
   height = h;
 }
 
+FIBITMAP *loadImage(const char *filename) {
+  FIBITMAP *dib1 = NULL;
+
+  FREE_IMAGE_FORMAT fif = FreeImage_GetFIFFromFilename(filename);
+
+  dib1 = FreeImage_Load(fif, filename, JPEG_DEFAULT);
+  if (!dib1) {
+    exit(1);
+  }
+  return dib1;
+}
+
+GLuint loadTexture(FIBITMAP *dib1) {
+  GLuint tex_id = 0;
+  int x, y;
+  int height, width;
+
+  RGBQUAD rgbquad;
+
+  FREE_IMAGE_TYPE type;
+  BITMAPINFOHEADER *header;
+
+  type = FreeImage_GetImageType(dib1);
+
+  height = FreeImage_GetHeight(dib1);
+  width = FreeImage_GetWidth(dib1);
+
+  header = FreeImage_GetInfoHeader(dib1);
+  int scanLineWidh =
+      ((3 * width) % 4 == 0) ? 3 * width : ((3 * width) / 4) * 4 + 4;
+  unsigned char *texels =
+      (GLubyte *)calloc(height * scanLineWidh, sizeof(GLubyte));
+  for (x = 0; x < width; x++)
+    for (y = 0; y < height; y++) {
+      FreeImage_GetPixelColor(dib1, x, y, &rgbquad);
+      texels[(y * scanLineWidh + 3 * x)] = ((GLubyte *)&rgbquad)[2];
+      texels[(y * scanLineWidh + 3 * x) + 1] = ((GLubyte *)&rgbquad)[1];
+      texels[(y * scanLineWidh + 3 * x) + 2] = ((GLubyte *)&rgbquad)[0];
+    }
+
+  glGenTextures(1, &tex_id);
+  glBindTexture(GL_TEXTURE_2D, tex_id);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+               GL_UNSIGNED_BYTE, texels);
+
+  free(texels);
+
+  return tex_id;
+}
+
 int main(int argc, char **argv) {
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
   glutInitWindowPosition(0, 0);
   glutCreateWindow("Solar System");
+
+  FIBITMAP *sun = loadImage("images/sun.jpg");
+  sun_tex = loadTexture(sun);
+  FreeImage_Unload(sun);
+
   initLighting();
   glutDisplayFunc(draw);
   glutReshapeFunc(reshape);
