@@ -25,6 +25,11 @@ static GLfloat sc[8] = {0.295, 0.40, 0.50, 0.60, 0.80, 1.0, 1.05, 1.13};
 static double ang = 2 * M_PI / 300;
 static double angular = 2 * M_PI / 50;
 
+static GLdouble eyeX = 2.0, eyeY = 0.0, eyeZ = 20.0, centerX = 0.0,
+                centerY = 0.0, centerZ = 0.0, upX = 0.0, upY = 1.0, upZ = 0.0;
+
+int width = 700, height = 700;
+
 static void initLighting() {
   // glMaterialfv(GL_FRONT,GL_AMBIENT,yellow);
   // glMaterialfv(GL_FRONT,GL_SPECULAR,yellow);
@@ -205,6 +210,41 @@ static void update_angle(float &angle, const float change) {
   }
 }
 
+static void specialKey(int key, int, int) {
+  switch (key) {
+  case GLUT_KEY_UP:
+    eyeX += 1.0;
+    break;
+  case GLUT_KEY_DOWN:
+    eyeX -= 1.0;
+    break;
+  case GLUT_KEY_LEFT:
+    eyeY -= 1.0;
+    break;
+  case GLUT_KEY_RIGHT:
+    eyeY += 1.0;
+  default:
+    break;
+  }
+  glLoadIdentity();
+  glViewport(0, 0, width, height);
+  gluPerspective(5.0, (GLdouble)width / (GLdouble)height, 3.0, 90.0);
+  glMatrixMode(GL_MODELVIEW);
+  gluLookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ);
+  glutPostRedisplay();
+}
+
+static void keyPressed(unsigned char key, int, int) {
+  switch (key) {
+  case 'q':
+  case 'Q':
+  // esc
+  case 27:
+    exit(0);
+  default:
+    break;
+  }
+}
 static void update(const int) {
   if ((angleMoon >= 0 && angleMoon < 180)) {
     sx -= 0.0003f;
@@ -236,7 +276,9 @@ static void reshape(int w, int h) {
   glViewport(0, 0, w, h);
   gluPerspective(5.0, (GLdouble)w / (GLdouble)h, 3.0, 90.0);
   glMatrixMode(GL_MODELVIEW);
-  gluLookAt(2.0, 0.0, 20.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+  gluLookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ);
+  width = w;
+  height = h;
 }
 
 int main(int argc, char **argv) {
@@ -247,6 +289,8 @@ int main(int argc, char **argv) {
   initLighting();
   glutDisplayFunc(draw);
   glutReshapeFunc(reshape);
+  glutSpecialFunc(specialKey);
+  glutKeyboardFunc(keyPressed);
   glutTimerFunc(25, update, 0);
   glutMainLoop();
   return 0;
