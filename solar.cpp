@@ -13,15 +13,7 @@ static GLfloat angleMoon = 0.0, angleEarth = 0.0, angleAstroid = 0.0,
                angleNeptune = 60.0;
 static GLfloat sx = 0.2f, sy = 0.2f, sz = 0.2f;
 
-static const GLfloat black[] = {0.0f, 0.0f, 0.0f, 1.0f};
-// static const GLfloat white[] = {1.0f, 1.0f, 1.0f, 1.0f};
-// static const GLfloat blue[] = {0.0f, 0.0f, 0.9f, 1.0f};
-// static const GLfloat er[] = {0.0f, 5.0f, 0.9f, 1.0f};
-static const GLfloat yellow[] = {0.7f, 0.2f, 0.0f, 1.0f};
-static const GLfloat qAmb[] = {0.1, 0.1, 0.1, 1.0};
-static const GLfloat qDif[] = {1.0, 1.0, 1.0, 1.0};
-static const GLfloat qSpec[] = {.50, .50, .50, .10};
-static const GLfloat qPos[] = {0, 0, 0, 0.1};
+static const GLfloat qAmb[] = {1.0, 1.0, 1.0, 1.0};
 
 static GLfloat sc[8] = {0.295, 0.40, 0.50, 0.60, 0.80, 1.0, 1.05, 1.13};
 static double ang = 2 * M_PI / 300;
@@ -30,20 +22,16 @@ static double angular = 2 * M_PI / 50;
 static GLdouble eyeX = 0.0, eyeY = 15.0, eyeZ = 15.0, centerX = 0.0,
                 centerY = 0.0, centerZ = 0.0, upX = 0.0, upY = 1.0, upZ = 0.0;
 static float angleX = 0.0, angleY = 0.0;
-int width = 700, height = 700;
+static int g_width = 700, g_height = 700;
 
-GLuint sun_tex;
+static GLuint sun_tex;
 
 static void initLighting() {
-  // glMaterialfv(GL_FRONT,GL_AMBIENT,yellow);
-  // glMaterialfv(GL_FRONT,GL_SPECULAR,yellow);
   glEnable(GL_LIGHTING);
-  glEnable(GL_LIGHT7);
-
-  glLightfv(GL_LIGHT7, GL_AMBIENT, qAmb);
-  glLightfv(GL_LIGHT7, GL_DIFFUSE, qDif);
-  glLightfv(GL_LIGHT7, GL_SPECULAR, qSpec);
-  // glMaterialfv(GL_FRONT,GL_DIFFUSE,yellow);
+  glEnable(GL_LIGHT1);
+  glEnable(GL_LIGHT2);
+  glLightfv(GL_LIGHT1, GL_AMBIENT, qAmb);
+  glLightfv(GL_LIGHT2, GL_AMBIENT, qAmb);
 }
 
 static void orbit() {
@@ -245,8 +233,8 @@ static void specialKey(int key, int, int) {
     break;
   }
   glLoadIdentity();
-  glViewport(0, 0, width, height);
-  gluPerspective(5.0, (GLdouble)width / (GLdouble)height, 3.0, 90.0);
+  glViewport(0, 0, g_width, g_height);
+  gluPerspective(5.0, (GLdouble)g_width / (GLdouble)g_height, 3.0, 90.0);
   glMatrixMode(GL_MODELVIEW);
   gluLookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ);
   glutPostRedisplay();
@@ -295,8 +283,8 @@ static void reshape(int w, int h) {
   gluPerspective(5.0, (GLdouble)w / (GLdouble)h, 3.0, 90.0);
   glMatrixMode(GL_MODELVIEW);
   gluLookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ);
-  width = w;
-  height = h;
+  g_width = w;
+  g_height = h;
 }
 
 FIBITMAP *loadImage(const char *filename) {
