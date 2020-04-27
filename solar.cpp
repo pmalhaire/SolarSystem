@@ -35,8 +35,8 @@ static void initLighting() {
 }
 
 static void orbit() {
-  glColor3f(0.5, 0.5, 0.5);
-
+  glColor3f(0.1, 0.1, 0.1);
+  glEnable(GL_LINE_SMOOTH);
   int i = 0;
   for (i = 0; i < 8; i++) {
     glPushMatrix();
@@ -46,11 +46,11 @@ static void orbit() {
       glRotatef(63, 1.0, 0.0, 0.0);
     }
     glScalef(sc[i], sc[i], sc[i]);
-    glBegin(GL_POINTS);
+    glBegin(GL_LINE_LOOP);
     double ang1 = 0.0;
     int j = 0;
     // creates points along the orbit
-    for (j = 0; j < 60; j++) {
+    for (j = 0; j < 50; j++) {
       glVertex2d(cos(ang1), sin(ang1));
       ang1 += 6 * ang;
     }
@@ -66,6 +66,7 @@ static void push_pop(std::function<void()> action) {
 }
 
 static void sun(void) {
+  glColor3f(1.0, 1.0, 1.0);
   push_pop([](void) {
     glScalef(sx, sy, sz);
     glEnable(GL_TEXTURE_2D);
