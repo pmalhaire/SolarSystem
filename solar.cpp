@@ -373,7 +373,7 @@ void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id,
 
 int main(int argc, char **argv) {
   glutInit(&argc, argv);
-  glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+  glutInitDisplayMode(GLUT_DEPTH | GLUT_SINGLE | GLUT_RGB);
   glutInitWindowPosition(0, 0);
   glutCreateWindow("Solar System");
   glewInit();
