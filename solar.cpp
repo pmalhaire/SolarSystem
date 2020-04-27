@@ -65,16 +65,7 @@ static void push_pop(std::function<void()> action) {
   glPopMatrix();
 }
 
-static void draw(void) {
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  orbit();
-
-  glPushMatrix();
-  glEnable(GL_DEPTH_TEST);
-  glEnable(GL_COLOR_MATERIAL);
-
-  // sun
+static void sun(void) {
   push_pop([](void) {
     glScalef(sx, sy, sz);
     glEnable(GL_TEXTURE_2D);
@@ -85,21 +76,26 @@ static void draw(void) {
     gluSphere(quadric, 1, 50, 50);
     glDisable(GL_TEXTURE_2D);
   });
+}
 
+static void mercury(void) {
   push_pop([](void) {
     glRotatef(angleMercury, 0.0, 1.0, -0.5);
     glTranslatef(0.3, 0.0, 0.0);
     glColor3f(1.0, 0.9, 0.0);
     glutSolidSphere(0.016, 50, 50);
   });
+}
 
+static void venus(void) {
   push_pop([](void) {
     glRotatef(angleVenus, 0.0, 1.0, -0.5);
     glTranslatef(0.4, 0.0, 0.0);
     glColor3f(0.9, 0.1, 0.0);
     glutSolidSphere(0.02, 50, 50);
   });
-
+}
+static void earth(void) {
   push_pop([](void) {
     glRotatef(angleEarth, 0.0, 1.0, -0.5);
     glTranslatef(0.5, 0.0, 0.0);
@@ -113,14 +109,16 @@ static void draw(void) {
       glutSolidSphere(0.023, 50, 50);
     }); // moon made
   });   // earth made
-
+}
+static void mars(void) {
   push_pop([](void) {
     glRotatef(angleMars, 0.0, 1.0, -0.5);
     glTranslatef(-0.6, 0.0, 0.0);
     glColor3f(0.05, 0.05, 0.01);
     glutSolidSphere(0.034, 50, 50);
   });
-
+}
+static void asteroid(void) {
   push_pop([](void) {
     glColor3f(3.30, 3.30, 3.30);
     glRotatef(63, 1.0, 0.0, 0.0);
@@ -143,7 +141,8 @@ static void draw(void) {
       });
     }
   }); // astroid made
-
+}
+static void jupiter(void) {
   push_pop([](void) {
     glRotatef(angleJupiter, 0.0, 1.0, -0.5);
     glTranslatef(-0.8, 0.0, 0.0);
@@ -156,7 +155,8 @@ static void draw(void) {
       glutSolidSphere(0.005, 50, 50);
     }); // moon made
   });
-
+}
+static void saturn(void) {
   push_pop([](void) {
     glRotatef(angleSaturn, 0.0, 1.0, -1.0);
     glTranslatef(-1.0, 0.0, 0.0);
@@ -178,20 +178,42 @@ static void draw(void) {
       glPointSize(2);
     }); // ring made
   });
-
+}
+static void uranus(void) {
   push_pop([](void) {
     glRotatef(angleUranus, 0.0, 1.0, -0.5);
     glTranslatef(1.04, 0.0, 0.0);
     glColor3f(0.0, 0.5, 0.9);
     glutSolidSphere(0.046, 50, 50);
   });
-
+}
+static void neptune(void) {
   push_pop([](void) {
     glRotatef(angleNeptune, 0.0, 1.0, -0.5);
     glTranslatef(-1.14, 0.0, 0.0);
     glColor3f(0.0, 0.0, 0.9);
     glutSolidSphere(0.04, 50, 50);
   });
+}
+
+static void draw(void) {
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  orbit();
+
+  glPushMatrix();
+  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_COLOR_MATERIAL);
+
+  sun();
+  mercury();
+  venus();
+  earth();
+  mars();
+  jupiter();
+  uranus();
+  neptune();
+  asteroid();
 
   glPopMatrix();
   glFlush();
