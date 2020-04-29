@@ -9,13 +9,13 @@ Solar System  Using C++ and Opengl
 ## arch
 
 ```
-pacman -S glu freeimage
+pacman -S libglvnd glu glut glew freeimage
 ```
 
 ## osx
 
 ```
-brew install freeimage
+brew install freeimage glut
 ```
 
 # build
