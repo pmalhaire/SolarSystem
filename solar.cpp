@@ -13,8 +13,6 @@ static GLfloat angleMoon = 0.0, angleEarth = 0.0, angleAstroid = 0.0,
                angleNeptune = 60.0;
 static GLfloat sx = 0.2f, sy = 0.2f, sz = 0.2f;
 
-static const GLfloat qAmb[] = {1.0, 1.0, 1.0, 1.0};
-
 static GLfloat sc[8] = {0.295, 0.40, 0.50, 0.60, 0.80, 1.0, 1.05, 1.13};
 static double ang = 2 * M_PI / 300;
 static double angular = 2 * M_PI / 50;
@@ -24,18 +22,30 @@ static GLdouble eyeX = 0.0, eyeY = 15.0, eyeZ = 15.0, centerX = 0.0,
 static float angleX = 0.0, angleY = 0.0;
 static int g_width = 700, g_height = 700;
 
-static GLuint sun_tex;
+static GLuint sun_tex, moon_tex, earth_tex, mercury_tex, venus_tex, mars_tex,
+    jupiter_tex, saturn_tex, uranus_tex, neptune_tex;
 
 static void initLighting() {
+  // Lighting set up
+  glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
   glEnable(GL_LIGHTING);
-  glEnable(GL_LIGHT1);
-  glEnable(GL_LIGHT2);
-  glLightfv(GL_LIGHT1, GL_AMBIENT, qAmb);
-  glLightfv(GL_LIGHT2, GL_AMBIENT, qAmb);
+  glEnable(GL_LIGHT0);
+
+  // Set lighting intensity and color
+  GLfloat qaAmbientLight[] = {0.1, 0.1, 0.1, 1.0};
+  GLfloat qaDiffuseLight[] = {0.8, 0.8, 0.8, 1.0};
+  GLfloat qaSpecularLight[] = {1.0, 1.0, 1.0, 1.0};
+  glLightfv(GL_LIGHT0, GL_AMBIENT, qaAmbientLight);
+  glLightfv(GL_LIGHT0, GL_DIFFUSE, qaDiffuseLight);
+  glLightfv(GL_LIGHT0, GL_SPECULAR, qaSpecularLight);
+
+  // Set the light position
+  GLfloat qaLightPosition[] = {0.0, 0.0, 0.0, 1.0};
+  glLightfv(GL_LIGHT0, GL_POSITION, qaLightPosition);
 }
 
 static void orbit() {
-  glColor3f(0.1, 0.1, 0.1);
+  glColor3f(0.3, 0.3, 0.3);
   glEnable(GL_LINE_SMOOTH);
   int i = 0;
   for (i = 0; i < 8; i++) {
@@ -65,17 +75,22 @@ static void push_pop(std::function<void()> action) {
   glPopMatrix();
 }
 
-static void sun(void) {
+static void create_sphere(GLdouble radius, GLint slice, GLint stacks,
+                          GLuint texIdx) {
   glColor3f(1.0, 1.0, 1.0);
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, texIdx);
+  GLUquadricObj *quadric = gluNewQuadric();
+  gluQuadricTexture(quadric, true);
+  gluQuadricNormals(quadric, GLU_SMOOTH);
+  gluSphere(quadric, radius, slice, stacks);
+  glDisable(GL_TEXTURE_2D);
+}
+
+static void sun(void) {
   push_pop([](void) {
     glScalef(sx, sy, sz);
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, sun_tex);
-    GLUquadricObj *quadric = gluNewQuadric();
-    gluQuadricTexture(quadric, true);
-    gluQuadricNormals(quadric, GLU_SMOOTH);
-    gluSphere(quadric, 1, 50, 50);
-    glDisable(GL_TEXTURE_2D);
+    create_sphere(1, 50, 50, sun_tex);
   });
 }
 
@@ -83,8 +98,7 @@ static void mercury(void) {
   push_pop([](void) {
     glRotatef(angleMercury, 0.0, 1.0, -0.5);
     glTranslatef(0.3, 0.0, 0.0);
-    glColor3f(1.0, 0.9, 0.0);
-    glutSolidSphere(0.016, 50, 50);
+    create_sphere(0.016, 50, 50, mercury_tex);
   });
 }
 
@@ -92,22 +106,19 @@ static void venus(void) {
   push_pop([](void) {
     glRotatef(angleVenus, 0.0, 1.0, -0.5);
     glTranslatef(0.4, 0.0, 0.0);
-    glColor3f(0.9, 0.1, 0.0);
-    glutSolidSphere(0.02, 50, 50);
+    create_sphere(0.02, 50, 50, venus_tex);
   });
 }
 static void earth(void) {
   push_pop([](void) {
     glRotatef(angleEarth, 0.0, 1.0, -0.5);
     glTranslatef(0.5, 0.0, 0.0);
-    glColor3f(0.0, 0.1, 0.7);
-    glutSolidSphere(0.046, 50, 50);
+    create_sphere(0.046, 50, 50, earth_tex);
     // create satelite
     push_pop([](void) {
       glRotatef(angleMoon, 0.0, 0.1, 0.05);
       glTranslatef(0.0598, 0.0, 0.0);
-      glColor3f(1.0, 1.0, 1.0);
-      glutSolidSphere(0.023, 50, 50);
+      create_sphere(0.023, 50, 50, moon_tex);
     }); // moon made
   });   // earth made
 }
@@ -115,8 +126,7 @@ static void mars(void) {
   push_pop([](void) {
     glRotatef(angleMars, 0.0, 1.0, -0.5);
     glTranslatef(-0.6, 0.0, 0.0);
-    glColor3f(0.05, 0.05, 0.01);
-    glutSolidSphere(0.034, 50, 50);
+    create_sphere(0.034, 50, 50, mars_tex);
   });
 }
 static void asteroid(void) {
@@ -147,13 +157,11 @@ static void jupiter(void) {
   push_pop([](void) {
     glRotatef(angleJupiter, 0.0, 1.0, -0.5);
     glTranslatef(-0.8, 0.0, 0.0);
-    glColor3f(0.4, 0.2, 0.0);
-    glutSolidSphere(0.1, 50, 50);
+    create_sphere(0.1, 50, 50, jupiter_tex);
     push_pop([](void) {
       glRotatef(angleMoon, 1.0, -0.5, 0.0);
       glTranslatef(0.0, 0, 0.11);
-      glColor3f(1.0, 1.0, 1.0);
-      glutSolidSphere(0.005, 50, 50);
+      create_sphere(0.005, 50, 50, moon_tex);
     }); // moon made
   });
 }
@@ -161,12 +169,11 @@ static void saturn(void) {
   push_pop([](void) {
     glRotatef(angleSaturn, 0.0, 1.0, -1.0);
     glTranslatef(-1.0, 0.0, 0.0);
-    glColor3f(0.9, 0.0, 0.0);
-    glutSolidSphere(0.08, 50, 50);
+
+    create_sphere(0.08, 50, 50, saturn_tex);
     push_pop([](void) {
       glRotatef(45, 1.0, 0.0, 0.0);
       glPointSize(3);
-      glColor3f(5.0, 3.0, 1.0);
       glScalef(0.096, 0.096, 0.096);
       glBegin(GL_POINTS);
       double ang1 = 0.0;
@@ -184,16 +191,14 @@ static void uranus(void) {
   push_pop([](void) {
     glRotatef(angleUranus, 0.0, 1.0, -0.5);
     glTranslatef(1.04, 0.0, 0.0);
-    glColor3f(0.0, 0.5, 0.9);
-    glutSolidSphere(0.046, 50, 50);
+    create_sphere(0.046, 50, 50, uranus_tex);
   });
 }
 static void neptune(void) {
   push_pop([](void) {
     glRotatef(angleNeptune, 0.0, 1.0, -0.5);
     glTranslatef(-1.14, 0.0, 0.0);
-    glColor3f(0.0, 0.0, 0.9);
-    glutSolidSphere(0.04, 50, 50);
+    create_sphere(0.04, 50, 50, neptune_tex);
   });
 }
 
@@ -203,7 +208,9 @@ static void draw(void) {
   orbit();
 
   glPushMatrix();
+  // test depth ensure ze don't draw object behind eachother
   glEnable(GL_DEPTH_TEST);
+  // don't know about this
   glEnable(GL_COLOR_MATERIAL);
 
   sun();
