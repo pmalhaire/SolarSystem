@@ -379,18 +379,36 @@ void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id,
           message);
 }
 
+static void load_texture(const char *path, GLuint *idx) {
+  FIBITMAP *img = loadImage(path);
+  *idx = loadTexture(img);
+  FreeImage_Unload(img);
+}
+
+static void load_textures() {
+  load_texture("images/sun.jpg", &sun_tex);
+  load_texture("images/moon.jpg", &moon_tex);
+  load_texture("images/earth.jpg", &earth_tex);
+  load_texture("images/mercury.jpg", &mercury_tex);
+  load_texture("images/venus.jpg", &venus_tex);
+  load_texture("images/mars.jpg", &mars_tex);
+  load_texture("images/jupiter.jpg", &jupiter_tex);
+  load_texture("images/saturn.jpg", &saturn_tex);
+  load_texture("images/uranus.jpg", &uranus_tex);
+  load_texture("images/neptune.jpg", &neptune_tex);
+}
+
 int main(int argc, char **argv) {
   glutInit(&argc, argv);
-  glutInitDisplayMode(GLUT_DEPTH | GLUT_SINGLE | GLUT_RGB);
+  glutInitDisplayMode(GLUT_DEPTH | GLUT_SINGLE | GLUT_RGBA);
   glutInitWindowPosition(0, 0);
   glutCreateWindow("Solar System");
   glewInit();
+  // for debug todo put under #def
   glEnable(GL_DEBUG_OUTPUT);
   glDebugMessageCallback(MessageCallback, 0);
-  FIBITMAP *sun = loadImage("images/sun.jpg");
-  sun_tex = loadTexture(sun);
-  FreeImage_Unload(sun);
 
+  load_textures();
   initLighting();
   glutDisplayFunc(draw);
   glutReshapeFunc(reshape);
