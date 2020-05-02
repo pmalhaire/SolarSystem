@@ -13,7 +13,7 @@ static GLfloat angleMoon = 0.0, angleEarth = 0.0, angleAstroid = 0.0,
                angleNeptune = 60.0;
 static GLfloat sx = 0.2f, sy = 0.2f, sz = 0.2f;
 
-static GLfloat sc[8] = {0.295, 0.40, 0.50, 0.60, 0.80, 1.0, 1.05, 1.13};
+static GLfloat sc[7] = {0.295, 0.40, 0.50, 0.60, 0.80, 1.05, 1.13};
 static double ang = 2 * M_PI / 300;
 static double angular = 2 * M_PI / 50;
 
@@ -48,13 +48,9 @@ static void orbit() {
   glColor3f(0.3, 0.3, 0.3);
   glEnable(GL_LINE_SMOOTH);
   int i = 0;
-  for (i = 0; i < 8; i++) {
+  for (i = 0; i < sizeof(sc) / sizeof(GLfloat); i++) {
     glPushMatrix();
-    if (i == 5) {
-      glRotatef(45, 1.0, 0.0, 0.0);
-    } else {
-      glRotatef(63, 1.0, 0.0, 0.0);
-    }
+    glRotatef(63, 1.0, 0.0, 0.0);
     glScalef(sc[i], sc[i], sc[i]);
     glBegin(GL_LINE_LOOP);
     double ang1 = 0.0;
