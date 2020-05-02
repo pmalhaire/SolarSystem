@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef DEBUG
 #include <GL/glew.h>
+#endif
 #include <GL/glut.h>
 #include <math.h>
 #include <time.h>
@@ -44,6 +46,7 @@ static void initLighting() {
   glLightfv(GL_LIGHT0, GL_POSITION, qaLightPosition);
 }
 
+// todo refacto by planet
 static void orbit() {
   glColor3f(0.3, 0.3, 0.3);
   glEnable(GL_LINE_SMOOTH);
@@ -206,8 +209,6 @@ static void draw(void) {
   glPushMatrix();
   // test depth ensure ze don't draw object behind eachother
   glEnable(GL_DEPTH_TEST);
-  // don't know about this
-  glEnable(GL_COLOR_MATERIAL);
 
   sun();
   mercury();
@@ -277,7 +278,9 @@ static void keyPressed(unsigned char key, int, int) {
     break;
   }
 }
+
 static void update(const int) {
+  // todo explaing why
   if ((angleMoon >= 0 && angleMoon < 180)) {
     sx -= 0.0003f;
     sy -= 0.0003f;
@@ -326,6 +329,7 @@ static void load_textures() {
   load_texture("images/neptune.jpg", &neptune_tex);
 }
 
+#ifdef DEBUG
 void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id,
                                 GLenum severity, GLsizei length,
                                 const GLchar *message, const void *userParam) {
@@ -334,17 +338,19 @@ void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id,
           (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity,
           message);
 }
+#endif
 
 int main(int argc, char **argv) {
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_DEPTH | GLUT_SINGLE | GLUT_RGBA);
   glutInitWindowPosition(0, 0);
   glutCreateWindow("Solar System");
+#ifdef DEBUG
+  printf("Debug enabled\n");
   glewInit();
-  // for debug todo put under #def
   glEnable(GL_DEBUG_OUTPUT);
   glDebugMessageCallback(MessageCallback, 0);
-
+#endif
   load_textures();
   initLighting();
   glutDisplayFunc(draw);
