@@ -13,14 +13,20 @@ static GLfloat angleMoon = 0.0, angleEarth = 0.0, angleAstroid = 0.0,
                angleMars = 0.0, angleMercury = 0.0, angleVenus = 0.0,
                angleJupiter = 0.0, angleSaturn = 0.0, angleUranus = 30.0,
                angleNeptune = 60.0;
+
+// scale for sun
 static GLfloat sx = 0.2f, sy = 0.2f, sz = 0.2f;
 
+// orbit of each planet
 static GLfloat sc[7] = {0.295, 0.40, 0.50, 0.60, 0.80, 1.05, 1.13};
+
 static double ang = 2 * M_PI / 300;
 static double angular = 2 * M_PI / 50;
 
+// view params kept for moving using keys
 static GLdouble eyeX = 0.0, eyeY = 15.0, eyeZ = 15.0, centerX = 0.0,
                 centerY = 0.0, centerZ = 0.0, upX = 0.0, upY = 1.0, upZ = 0.0;
+
 static float angleX = 0.0, angleY = 0.0;
 static int g_width = 700, g_height = 700;
 
@@ -234,6 +240,17 @@ static void update_angle(float &angle, const float change) {
   }
 }
 
+// adapt geometry to window
+static void reshape(int w, int h) {
+  glLoadIdentity();
+  glViewport(0, 0, w, h);
+  gluPerspective(5.0, (GLdouble)w / (GLdouble)h, 3.0, 90.0);
+  glMatrixMode(GL_MODELVIEW);
+  gluLookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ);
+  g_width = w;
+  g_height = h;
+}
+
 static void specialKey(int key, int, int) {
   const double step = 0.1;
   switch (key) {
@@ -259,12 +276,8 @@ static void specialKey(int key, int, int) {
   default:
     break;
   }
-  glLoadIdentity();
-  glViewport(0, 0, g_width, g_height);
-  gluPerspective(5.0, (GLdouble)g_width / (GLdouble)g_height, 3.0, 90.0);
-  glMatrixMode(GL_MODELVIEW);
-  gluLookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ);
-  glutPostRedisplay();
+
+  reshape(g_width, g_height);
 }
 
 static void keyPressed(unsigned char key, int, int) {
@@ -303,17 +316,6 @@ static void update(const int) {
 
   glutPostRedisplay();
   glutTimerFunc(20, update, 0);
-}
-
-// adapt geometry to window
-static void reshape(int w, int h) {
-  glLoadIdentity();
-  glViewport(0, 0, w, h);
-  gluPerspective(5.0, (GLdouble)w / (GLdouble)h, 3.0, 90.0);
-  glMatrixMode(GL_MODELVIEW);
-  gluLookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ);
-  g_width = w;
-  g_height = h;
 }
 
 static void load_textures() {
