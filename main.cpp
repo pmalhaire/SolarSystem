@@ -102,7 +102,7 @@ static void mercury(void) {
   orbit(eccMercury);
   push_pop([](void) {
     glRotatef(angleMercury, 0.0, 1.0, -0.5);
-    glTranslatef(0.3, 0.0, 0.0);
+    glTranslatef(eccMercury, 0.0, 0.0);
     create_sphere(0.016, 50, 50, mercury_tex);
   });
 }
@@ -111,7 +111,7 @@ static void venus(void) {
   orbit(eccVenus);
   push_pop([](void) {
     glRotatef(angleVenus, 0.0, 1.0, -0.5);
-    glTranslatef(0.4, 0.0, 0.0);
+    glTranslatef(eccVenus, 0.0, 0.0);
     create_sphere(0.02, 50, 50, venus_tex);
   });
 }
@@ -119,7 +119,7 @@ static void earth(void) {
   orbit(eccEarth);
   push_pop([](void) {
     glRotatef(angleEarth, 0.0, 1.0, -0.5);
-    glTranslatef(0.5, 0.0, 0.0);
+    glTranslatef(eccEarth, 0.0, 0.0);
     create_sphere(0.046, 50, 50, earth_tex);
     // create satelite
     push_pop([](void) {
@@ -133,7 +133,7 @@ static void mars(void) {
   orbit(eccMars);
   push_pop([](void) {
     glRotatef(angleMars, 0.0, 1.0, -0.5);
-    glTranslatef(-0.6, 0.0, 0.0);
+    glTranslatef(-eccMars, 0.0, 0.0);
     create_sphere(0.034, 50, 50, mars_tex);
   });
 }
@@ -165,7 +165,7 @@ static void jupiter(void) {
   orbit(eccJupiter);
   push_pop([](void) {
     glRotatef(angleJupiter, 0.0, 1.0, -0.5);
-    glTranslatef(-0.8, 0.0, 0.0);
+    glTranslatef(-eccJupiter, 0.0, 0.0);
     create_sphere(0.1, 50, 50, jupiter_tex);
     push_pop([](void) {
       glRotatef(angleMoon, 1.0, -0.5, 0.0);
@@ -178,7 +178,7 @@ static void saturn(void) {
   orbit(eccSaturn);
   push_pop([](void) {
     glRotatef(angleSaturn, 0.0, 1.0, -1.0);
-    glTranslatef(-1.0, 0.0, 0.0);
+    glTranslatef(-eccSaturn, 0.0, 0.0);
 
     create_sphere(0.08, 50, 50, saturn_tex);
     push_pop([](void) {
@@ -201,7 +201,7 @@ static void uranus(void) {
   orbit(eccUranus);
   push_pop([](void) {
     glRotatef(angleUranus, 0.0, 1.0, -0.5);
-    glTranslatef(1.04, 0.0, 0.0);
+    glTranslatef(eccUranus, 0.0, 0.0);
     create_sphere(0.046, 50, 50, uranus_tex);
   });
 }
@@ -209,7 +209,7 @@ static void neptune(void) {
   orbit(eccNeptune);
   push_pop([](void) {
     glRotatef(angleNeptune, 0.0, 1.0, -0.5);
-    glTranslatef(-1.14, 0.0, 0.0);
+    glTranslatef(-eccNeptune, 0.0, 0.0);
     create_sphere(0.04, 50, 50, neptune_tex);
   });
 }
