@@ -52,32 +52,36 @@ static void initLighting() {
   glLightfv(GL_LIGHT0, GL_POSITION, qaLightPosition);
 }
 
-// todo refacto by planet
-static void orbit() {
-  glColor3f(0.3, 0.3, 0.3);
-  glEnable(GL_LINE_SMOOTH);
-  int i = 0;
-  for (i = 0; i < sizeof(sc) / sizeof(GLfloat); i++) {
-    glPushMatrix();
-    glRotatef(63, 1.0, 0.0, 0.0);
-    glScalef(sc[i], sc[i], sc[i]);
-    glBegin(GL_LINE_LOOP);
-    double ang1 = 0.0;
-    int j = 0;
-    // creates points along the orbit
-    for (j = 0; j < 50; j++) {
-      glVertex2d(cos(ang1), sin(ang1));
-      ang1 += 6 * ang;
-    }
-    glEnd();
-    glPopMatrix();
-  }
-}
-
 static void push_pop(std::function<void()> action) {
   glPushMatrix();
   action();
   glPopMatrix();
+}
+
+static void orbit(GLfloat scale) {
+  glColor3f(0.3, 0.3, 0.3);
+  glEnable(GL_LINE_SMOOTH);
+  glRotatef(63, 1.0, 0.0, 0.0);
+  glScalef(scale, scale, scale);
+  glBegin(GL_LINE_LOOP);
+  double ang1 = 0.0;
+  int j = 0;
+  // creates points along the orbit
+  for (j = 0; j < 50; j++) {
+    glVertex2d(cos(ang1), sin(ang1));
+    ang1 += 6 * ang;
+  }
+  glEnd();
+  glDisable(GL_LINE_SMOOTH);
+}
+
+// todo refacto by planet
+static void orbits() {
+
+  int i = 0;
+  for (i = 0; i < sizeof(sc) / sizeof(GLfloat); i++) {
+    push_pop([i](void) { orbit(sc[i]); });
+  }
 }
 
 static void create_sphere(GLdouble radius, GLint slice, GLint stacks,
@@ -210,9 +214,8 @@ static void neptune(void) {
 static void draw(void) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  orbit();
+  orbits();
 
-  glPushMatrix();
   // test depth ensure ze don't draw object behind eachother
   glEnable(GL_DEPTH_TEST);
 
@@ -226,7 +229,6 @@ static void draw(void) {
   neptune();
   asteroid();
 
-  glPopMatrix();
   glFlush();
 }
 
@@ -276,7 +278,10 @@ static void specialKey(int key, int, int) {
   default:
     break;
   }
-
+#ifdef DEBUG
+  printf("specialKey %d eye(%f,%f,%f) angle(%f,%f)\n", key, eyeX, eyeY, eyeZ,
+         angleX, angleY);
+#endif
   reshape(g_width, g_height);
 }
 
@@ -293,16 +298,16 @@ static void keyPressed(unsigned char key, int, int) {
 }
 
 static void update(const int) {
-  // todo explaing why
-  if ((angleMoon >= 0 && angleMoon < 180)) {
-    sx -= 0.0003f;
-    sy -= 0.0003f;
-    sz -= 0.0003f;
-  } else {
-    sx += 0.0003f;
-    sy += 0.0003f;
-    sz += 0.0003f;
-  }
+  // // todo explaing why
+  // if ((angleMoon >= 0 && angleMoon < 180)) {
+  //   sx -= 0.0003f;
+  //   sy -= 0.0003f;
+  //   sz -= 0.0003f;
+  // } else {
+  //   sx += 0.0003f;
+  //   sy += 0.0003f;
+  //   sz += 0.0003f;
+  // }
   update_angle(angleMoon, 2.0f);
   update_angle(angleEarth, 0.7f);
   update_angle(angleMercury, 2.0f);
