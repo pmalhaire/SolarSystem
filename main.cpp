@@ -108,23 +108,15 @@ static void sun(void) {
   push_pop([](void) { create_sphere(sizeSun, 50, 50, sun_tex); });
 }
 
-static void mercury(void) {
-  orbit(eccMercury);
-  push_pop([](void) {
-    glRotatef(angleMercury, 0.0, 1.0, -0.5);
-    glTranslatef(eccMercury, 0.0, 0.0);
-    create_sphere(sizeMercury, 50, 50, mercury_tex);
+static void planet(GLfloat dist, GLfloat size, GLfloat angle, GLuint tex) {
+  orbit(dist);
+  push_pop([angle, dist, size, tex](void) {
+    glRotatef(angle, 0.0, 1.0, -0.5);
+    glTranslatef(dist, 0.0, 0.0);
+    create_sphere(size, 50, 50, tex);
   });
 }
 
-static void venus(void) {
-  orbit(eccVenus);
-  push_pop([](void) {
-    glRotatef(angleVenus, 0.0, 1.0, -0.5);
-    glTranslatef(eccVenus, 0.0, 0.0);
-    create_sphere(sizeVenus, 50, 50, venus_tex);
-  });
-}
 static void earth(void) {
   orbit(eccEarth);
   push_pop([](void) {
@@ -231,8 +223,9 @@ static void draw(void) {
   glEnable(GL_DEPTH_TEST);
 
   sun();
-  mercury();
-  venus();
+
+  planet(eccMercury, sizeMercury, angleMercury, mercury_tex);
+  planet(eccVenus, sizeVenus, angleVenus, venus_tex);
   earth();
   mars();
   jupiter();
