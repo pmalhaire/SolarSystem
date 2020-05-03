@@ -25,7 +25,6 @@ static GLfloat sizeMercury = 0.016, sizeVenus = 0.02, sizeEarth = 0.046,
                sizeMars = 0.034, sizeJupiter = 0.1, sizeSaturn = 0.08,
                sizeUranus = 0.046, sizeNeptune = 0.04;
 
-static double ang = 2 * M_PI / 300;
 static double angular = 2 * M_PI / 50;
 
 // view params kept for moving using keys
@@ -63,6 +62,19 @@ static void push_pop(std::function<void()> action) {
   glPopMatrix();
 }
 
+static std::vector<double> circle(const int points) {
+  std::vector<double> vertices;
+  double ang = 0.0;
+  static const double step = 2.0 * M_PI / static_cast<double>(points);
+  // creates points along the orbit
+  for (int j = 0; j < points; j++) {
+    vertices.push_back(cos(ang));
+    vertices.push_back(sin(ang));
+    ang += step;
+  }
+  return vertices;
+}
+
 static void orbit(GLfloat scale) {
   push_pop([scale](void) {
     glColor3f(0.3, 0.3, 0.3);
@@ -70,12 +82,11 @@ static void orbit(GLfloat scale) {
     glRotatef(63, 1.0, 0.0, 0.0);
     glScalef(scale, scale, scale);
     glBegin(GL_LINE_LOOP);
-    double ang1 = 0.0;
-    int j = 0;
-    // creates points along the orbit
-    for (j = 0; j < 50; j++) {
-      glVertex2d(cos(ang1), sin(ang1));
-      ang1 += 6 * ang;
+
+    static const int points = 50;
+    auto vertices = circle(points);
+    for (int j = 0; j < 2 * points; j += 2) {
+      glVertex2d(vertices[j], vertices[j + 1]);
     }
     glEnd();
     glDisable(GL_LINE_SMOOTH);
@@ -318,7 +329,6 @@ static void keyPressed(unsigned char key, int, int) {
 }
 
 static void update(const int) {
-
   update_angle(angleMoon, 2.0f);
   update_angle(angleEarth, 0.7f);
   update_angle(angleMercury, 2.0f);
