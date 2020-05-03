@@ -18,7 +18,9 @@ static GLfloat angleMoon = 0.0, angleEarth = 0.0, angleAstroid = 0.0,
 static GLfloat sx = 0.2f, sy = 0.2f, sz = 0.2f;
 
 // orbit of each planet
-static GLfloat sc[7] = {0.295, 0.40, 0.50, 0.60, 0.80, 1.05, 1.13};
+static GLfloat eccMercury = 0.295, eccVenus = 0.4, eccEarth = 0.5,
+               eccMars = 0.6, eccJupiter = 0.8, eccSaturn = 1.0,
+               eccUranus = 1.05, eccNeptune = 1.13;
 
 static double ang = 2 * M_PI / 300;
 static double angular = 2 * M_PI / 50;
@@ -59,29 +61,22 @@ static void push_pop(std::function<void()> action) {
 }
 
 static void orbit(GLfloat scale) {
-  glColor3f(0.3, 0.3, 0.3);
-  glEnable(GL_LINE_SMOOTH);
-  glRotatef(63, 1.0, 0.0, 0.0);
-  glScalef(scale, scale, scale);
-  glBegin(GL_LINE_LOOP);
-  double ang1 = 0.0;
-  int j = 0;
-  // creates points along the orbit
-  for (j = 0; j < 50; j++) {
-    glVertex2d(cos(ang1), sin(ang1));
-    ang1 += 6 * ang;
-  }
-  glEnd();
-  glDisable(GL_LINE_SMOOTH);
-}
-
-// todo refacto by planet
-static void orbits() {
-
-  int i = 0;
-  for (i = 0; i < sizeof(sc) / sizeof(GLfloat); i++) {
-    push_pop([i](void) { orbit(sc[i]); });
-  }
+  push_pop([scale](void) {
+    glColor3f(0.3, 0.3, 0.3);
+    glEnable(GL_LINE_SMOOTH);
+    glRotatef(63, 1.0, 0.0, 0.0);
+    glScalef(scale, scale, scale);
+    glBegin(GL_LINE_LOOP);
+    double ang1 = 0.0;
+    int j = 0;
+    // creates points along the orbit
+    for (j = 0; j < 50; j++) {
+      glVertex2d(cos(ang1), sin(ang1));
+      ang1 += 6 * ang;
+    }
+    glEnd();
+    glDisable(GL_LINE_SMOOTH);
+  });
 }
 
 static void create_sphere(GLdouble radius, GLint slice, GLint stacks,
@@ -104,6 +99,7 @@ static void sun(void) {
 }
 
 static void mercury(void) {
+  orbit(eccMercury);
   push_pop([](void) {
     glRotatef(angleMercury, 0.0, 1.0, -0.5);
     glTranslatef(0.3, 0.0, 0.0);
@@ -112,6 +108,7 @@ static void mercury(void) {
 }
 
 static void venus(void) {
+  orbit(eccVenus);
   push_pop([](void) {
     glRotatef(angleVenus, 0.0, 1.0, -0.5);
     glTranslatef(0.4, 0.0, 0.0);
@@ -119,6 +116,7 @@ static void venus(void) {
   });
 }
 static void earth(void) {
+  orbit(eccEarth);
   push_pop([](void) {
     glRotatef(angleEarth, 0.0, 1.0, -0.5);
     glTranslatef(0.5, 0.0, 0.0);
@@ -132,6 +130,7 @@ static void earth(void) {
   });   // earth made
 }
 static void mars(void) {
+  orbit(eccMars);
   push_pop([](void) {
     glRotatef(angleMars, 0.0, 1.0, -0.5);
     glTranslatef(-0.6, 0.0, 0.0);
@@ -163,6 +162,7 @@ static void asteroid(void) {
   }); // astroid made
 }
 static void jupiter(void) {
+  orbit(eccJupiter);
   push_pop([](void) {
     glRotatef(angleJupiter, 0.0, 1.0, -0.5);
     glTranslatef(-0.8, 0.0, 0.0);
@@ -175,6 +175,7 @@ static void jupiter(void) {
   });
 }
 static void saturn(void) {
+  orbit(eccSaturn);
   push_pop([](void) {
     glRotatef(angleSaturn, 0.0, 1.0, -1.0);
     glTranslatef(-1.0, 0.0, 0.0);
@@ -197,6 +198,7 @@ static void saturn(void) {
   });
 }
 static void uranus(void) {
+  orbit(eccUranus);
   push_pop([](void) {
     glRotatef(angleUranus, 0.0, 1.0, -0.5);
     glTranslatef(1.04, 0.0, 0.0);
@@ -204,6 +206,7 @@ static void uranus(void) {
   });
 }
 static void neptune(void) {
+  orbit(eccNeptune);
   push_pop([](void) {
     glRotatef(angleNeptune, 0.0, 1.0, -0.5);
     glTranslatef(-1.14, 0.0, 0.0);
@@ -213,8 +216,6 @@ static void neptune(void) {
 
 static void draw(void) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  orbits();
 
   // test depth ensure ze don't draw object behind eachother
   glEnable(GL_DEPTH_TEST);
@@ -273,17 +274,24 @@ static void specialKey(int key, int, int) {
     eyeZ = 15.0 * sin(angleX);
     break;
   case GLUT_KEY_LEFT:
-    update_angle(angleY, step);
+    angleY += step;
+    if (angleY > 2 * M_PI) {
+      angleY -= 2 * M_PI;
+    }
     eyeX = 15.0 * cos(angleY);
     eyeZ = 15.0 * sin(angleY);
     break;
   case GLUT_KEY_RIGHT:
-    update_angle(angleY, -step);
+    angleY -= step;
+    if (angleY < 0.0) {
+      angleY += 2 * M_PI;
+    }
     eyeX = 15.0 * cos(angleY);
     eyeZ = 15.0 * sin(angleY);
   default:
     break;
   }
+  // fix axis based on rotation
   if (angleX < M_PI) {
     upY = 1.0;
   } else {
@@ -311,16 +319,7 @@ static void keyPressed(unsigned char key, int, int) {
 }
 
 static void update(const int) {
-  // // todo explaing why
-  // if ((angleMoon >= 0 && angleMoon < 180)) {
-  //   sx -= 0.0003f;
-  //   sy -= 0.0003f;
-  //   sz -= 0.0003f;
-  // } else {
-  //   sx += 0.0003f;
-  //   sy += 0.0003f;
-  //   sz += 0.0003f;
-  // }
+
   update_angle(angleMoon, 2.0f);
   update_angle(angleEarth, 0.7f);
   update_angle(angleMercury, 2.0f);
