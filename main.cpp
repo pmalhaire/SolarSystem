@@ -257,12 +257,18 @@ static void specialKey(int key, int, int) {
   const double step = 0.1;
   switch (key) {
   case GLUT_KEY_UP:
-    update_angle(angleX, step);
+    angleX += step;
+    if (angleX > 2 * M_PI) {
+      angleX -= 2 * M_PI;
+    }
     eyeY = 15.0 * cos(angleX);
     eyeZ = 15.0 * sin(angleX);
     break;
   case GLUT_KEY_DOWN:
-    update_angle(angleX, -step);
+    angleX -= step;
+    if (angleX < 0.0) {
+      angleX += 2 * M_PI;
+    }
     eyeY = 15.0 * cos(angleX);
     eyeZ = 15.0 * sin(angleX);
     break;
@@ -278,9 +284,16 @@ static void specialKey(int key, int, int) {
   default:
     break;
   }
+  if (angleX < M_PI) {
+    upY = 1.0;
+  } else {
+    upY = -1.0;
+  }
 #ifdef DEBUG
-  printf("specialKey %d eye(%f,%f,%f) angle(%f,%f)\n", key, eyeX, eyeY, eyeZ,
-         angleX, angleY);
+  printf("specialKey %d eye(%f,%f,%f) angle(%f,%f) center(%f,%f,%f) "
+         "up(%f,%f,%f)\n",
+         key, eyeX, eyeY, eyeZ, angleX, angleY, centerX, centerY, centerZ, upX,
+         upY, upZ);
 #endif
   reshape(g_width, g_height);
 }
