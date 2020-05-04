@@ -16,17 +16,17 @@ static GLfloat angleMoon = 0.0, angleEarth = 0.0, angleAstroid = 0.0,
                angleNeptune = 60.0;
 
 // scale for sun
-static GLfloat sizeSun = 0.2f;
+static GLdouble sizeSun = 0.2;
 
 // orbit of each planet
 static GLfloat distMercury = 0.295f, distVenus = 0.4f, distEarth = 0.5f,
                distMars = 0.6f, distJupiter = 0.8f, distSaturn = 1.0f,
                distUranus = 1.05f, distNeptune = 1.13f, distEarthMoon = 0.0598f,
                distJupiterMoon = 0.11f;
-static GLfloat sizeMercury = 0.016f, sizeVenus = 0.02f, sizeEarth = 0.046f,
-               sizeMars = 0.034f, sizeJupiter = 0.1f, sizeSaturn = 0.08f,
-               sizeUranus = 0.046f, sizeNeptune = 0.04f, sizeEarthMoon = 0.023f,
-               sizeJupiterMoon = 0.005f;
+static GLdouble sizeMercury = 0.016, sizeVenus = 0.02, sizeEarth = 0.046,
+                sizeMars = 0.034, sizeJupiter = 0.1, sizeSaturn = 0.08,
+                sizeUranus = 0.046, sizeNeptune = 0.04, sizeEarthMoon = 0.023,
+                sizeJupiterMoon = 0.005;
 
 static double angular = 2 * M_PI / 50;
 
@@ -34,7 +34,7 @@ static double angular = 2 * M_PI / 50;
 static GLdouble eyeX = 0.0, eyeY = 15.0, eyeZ = 15.0, centerX = 0.0,
                 centerY = 0.0, centerZ = 0.0, upX = 0.0, upY = 1.0, upZ = 0.0;
 
-static float angleX = 0.0, angleY = 0.0;
+static double angleX = 0.0, angleY = 0.0;
 static int g_width = 700, g_height = 700;
 
 static GLuint sun_tex, moon_tex, earth_tex, mercury_tex, venus_tex, mars_tex,
@@ -88,7 +88,7 @@ static void orbit(GLfloat scale) {
 
     static const int points = 50;
     auto vertices = circle(points);
-    for (int j = 0; j < 2 * points; j += 2) {
+    for (unsigned long j = 0; j < 2 * points; j += 2) {
       glVertex2d(vertices[j], vertices[j + 1]);
     }
     glEnd();
@@ -111,40 +111,41 @@ static void sun(void) {
   push_pop([](void) { create_sphere(sizeSun, 50, 50, sun_tex); });
 }
 
-static void planet(GLfloat dist, GLfloat size, GLfloat angle, GLuint tex) {
+static void planet(GLfloat dist, GLdouble size, GLfloat angle, GLuint tex) {
   orbit(dist);
-  push_pop([angle, dist, size, tex](void) {
+  push_pop([&angle, &dist, &size, &tex](void) {
     glRotatef(angle, 0.0, 1.0, -0.5);
     glTranslatef(dist, 0.0, 0.0);
     create_sphere(size, 50, 50, tex);
   });
 }
 
-static void planet_with_moon(GLfloat dist, GLfloat size, GLfloat angle,
-                             GLuint tex, GLfloat distMoon, GLfloat sizeMoon,
-                             GLfloat angleMoon, GLuint texMoon) {
+static void planet_with_moon(GLfloat dist, GLdouble size, GLfloat angle,
+                             GLuint tex, GLfloat distMoon, GLdouble sizeMoon,
+                             GLfloat planetMoon, GLuint texMoon) {
   planet(dist, size, angle, tex);
-  push_pop([angle, dist, distMoon, sizeMoon, angleMoon, texMoon](void) {
+  push_pop([&angle, &dist, &distMoon, &sizeMoon, &planetMoon, &texMoon](void) {
     glRotatef(angle, 0.0, 1.0, -0.5);
     glTranslatef(dist, 0.0, 0.0);
-    planet(distMoon, sizeMoon, angleMoon, texMoon);
+    planet(distMoon, sizeMoon, planetMoon, texMoon);
   });
 }
 
 static void asteroid(void) {
   push_pop([](void) {
-    glColor3f(3.30, 3.30, 3.30);
-    glRotatef(63, 1.0, 0.0, 0.0);
+    glColor3f(3.30f, 3.30f, 3.30f);
+    glRotatef(63.0f, 1.0f, 0.0f, 0.0f);
     int div = 90;
     float siz = 2;
-    float scl[4] = {0.66, 0.68, 0.67, 0.64};
+    float scl[4] = {0.66f, 0.68f, 0.67f, 0.64f};
     for (int j = 0; j < 4; j++) {
-      push_pop([&siz, &scl, j, &div](void) {
-        siz -= 0.3;
+      push_pop([&siz, &scl, &j, &div](void) {
+        siz -= 0.3f;
         glPointSize(siz);
         glScalef(scl[j], scl[j], scl[j]);
         glBegin(GL_POINTS);
-        double ang1 = 0.0 - angleAstroid, a = (2 * M_PI) / div;
+        double ang1 = 0.0 - static_cast<GLdouble>(angleAstroid),
+               a = (2 * M_PI) / div;
         for (int i = 0; i < div; i++) {
           glVertex2d(cos(ang1), sin(ang1));
           ang1 += a;
@@ -159,14 +160,14 @@ static void asteroid(void) {
 static void saturn(void) {
   orbit(distSaturn);
   push_pop([](void) {
-    glRotatef(angleSaturn, 0.0, 1.0, -1.0);
-    glTranslatef(-distSaturn, 0.0, 0.0);
+    glRotatef(angleSaturn, 0.0f, 1.0f, -1.0f);
+    glTranslatef(-distSaturn, 0.0f, 0.0f);
 
     create_sphere(sizeSaturn, 50, 50, saturn_tex);
     push_pop([](void) {
-      glRotatef(45, 1.0, 0.0, 0.0);
+      glRotatef(45.0f, 1.0f, 0.0f, 0.0f);
       glPointSize(3);
-      glScalef(0.096, 0.096, 0.096);
+      glScalef(0.096f, 0.096f, 0.096f);
       glBegin(GL_POINTS);
       double ang1 = 0.0;
       for (int i = 0; i < 50; i++) {
@@ -195,6 +196,7 @@ static void draw(void) {
   planet(distMars, sizeMars, angleMars, mars_tex);
   planet_with_moon(distJupiter, sizeJupiter, angleJupiter, jupiter_tex,
                    distJupiterMoon, sizeJupiterMoon, angleMoon, moon_tex);
+  saturn();
   planet(distUranus, sizeUranus, angleUranus, uranus_tex);
   planet(distNeptune, sizeNeptune, angleNeptune, neptune_tex);
   asteroid();
@@ -216,7 +218,8 @@ static void update_angle(float &angle, const float change) {
 static void reshape(int w, int h) {
   glLoadIdentity();
   glViewport(0, 0, w, h);
-  gluPerspective(5.0, (GLdouble)w / (GLdouble)h, 3.0, 90.0);
+  gluPerspective(5.0, static_cast<GLdouble>(w) / static_cast<GLdouble>(h), 3.0,
+                 90.0);
   glMatrixMode(GL_MODELVIEW);
   gluLookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ);
   g_width = w;
@@ -257,6 +260,7 @@ static void specialKey(int key, int, int) {
     }
     eyeX = 15.0 * cos(angleY);
     eyeZ = 15.0 * sin(angleY);
+    break;
   default:
     break;
   }
