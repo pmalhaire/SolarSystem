@@ -6,6 +6,7 @@
 #include <GL/glut.h>
 #include <math.h>
 #include <time.h>
+#include <vector>
 #include <functional>
 #include "textures.hpp"
 
@@ -18,14 +19,14 @@ static GLfloat angleMoon = 0.0, angleEarth = 0.0, angleAstroid = 0.0,
 static GLfloat sizeSun = 0.2f;
 
 // orbit of each planet
-static GLfloat eccMercury = 0.295, eccVenus = 0.4, eccEarth = 0.5,
-               eccMars = 0.6, eccJupiter = 0.8, eccSaturn = 1.0,
-               eccUranus = 1.05, eccNeptune = 1.13, eccEarthMoon = 0.0598,
-               eccJupiterMoon = 0.11;
-static GLfloat sizeMercury = 0.016, sizeVenus = 0.02, sizeEarth = 0.046,
-               sizeMars = 0.034, sizeJupiter = 0.1, sizeSaturn = 0.08,
-               sizeUranus = 0.046, sizeNeptune = 0.04, sizeEarthMoon = 0.023,
-               sizeJupiterMoon = 0.005;
+static GLfloat distMercury = 0.295f, distVenus = 0.4f, distEarth = 0.5f,
+               distMars = 0.6f, distJupiter = 0.8f, distSaturn = 1.0f,
+               distUranus = 1.05f, distNeptune = 1.13f, distEarthMoon = 0.0598f,
+               distJupiterMoon = 0.11f;
+static GLfloat sizeMercury = 0.016f, sizeVenus = 0.02f, sizeEarth = 0.046f,
+               sizeMars = 0.034f, sizeJupiter = 0.1f, sizeSaturn = 0.08f,
+               sizeUranus = 0.046f, sizeNeptune = 0.04f, sizeEarthMoon = 0.023f,
+               sizeJupiterMoon = 0.005f;
 
 static double angular = 2 * M_PI / 50;
 
@@ -46,9 +47,9 @@ static void initLighting() {
   glEnable(GL_LIGHT0);
 
   // Set lighting intensity and color
-  GLfloat qaAmbientLight[] = {0.1, 0.1, 0.1, 1.0};
-  GLfloat qaDiffuseLight[] = {0.8, 0.8, 0.8, 1.0};
-  GLfloat qaSpecularLight[] = {1.0, 1.0, 1.0, 1.0};
+  GLfloat qaAmbientLight[] = {0.1f, 0.1f, 0.1f, 1.0f};
+  GLfloat qaDiffuseLight[] = {0.8f, 0.8f, 0.8f, 1.0f};
+  GLfloat qaSpecularLight[] = {1.0f, 1.0f, 1.0f, 1.0f};
   glLightfv(GL_LIGHT0, GL_AMBIENT, qaAmbientLight);
   glLightfv(GL_LIGHT0, GL_DIFFUSE, qaDiffuseLight);
   glLightfv(GL_LIGHT0, GL_SPECULAR, qaSpecularLight);
@@ -79,7 +80,7 @@ static std::vector<double> circle(const int points) {
 
 static void orbit(GLfloat scale) {
   push_pop([scale](void) {
-    glColor3f(0.3, 0.3, 0.3);
+    glColor3f(0.3f, 0.3f, 0.3f);
     glEnable(GL_LINE_SMOOTH);
     glRotatef(63, 1.0, 0.0, 0.0);
     glScalef(scale, scale, scale);
@@ -156,10 +157,10 @@ static void asteroid(void) {
 }
 
 static void saturn(void) {
-  orbit(eccSaturn);
+  orbit(distSaturn);
   push_pop([](void) {
     glRotatef(angleSaturn, 0.0, 1.0, -1.0);
-    glTranslatef(-eccSaturn, 0.0, 0.0);
+    glTranslatef(-distSaturn, 0.0, 0.0);
 
     create_sphere(sizeSaturn, 50, 50, saturn_tex);
     push_pop([](void) {
@@ -187,15 +188,15 @@ static void draw(void) {
 
   sun();
 
-  planet(eccMercury, sizeMercury, angleMercury, mercury_tex);
-  planet(eccVenus, sizeVenus, angleVenus, venus_tex);
-  planet_with_moon(eccEarth, sizeEarth, angleEarth, earth_tex, eccEarthMoon,
+  planet(distMercury, sizeMercury, angleMercury, mercury_tex);
+  planet(distVenus, sizeVenus, angleVenus, venus_tex);
+  planet_with_moon(distEarth, sizeEarth, angleEarth, earth_tex, distEarthMoon,
                    sizeEarthMoon, angleMoon, moon_tex);
-  planet(eccMars, sizeMars, angleMars, mars_tex);
-  planet_with_moon(eccJupiter, sizeJupiter, angleJupiter, jupiter_tex,
-                   eccJupiterMoon, sizeJupiterMoon, angleMoon, moon_tex);
-  planet(eccUranus, sizeUranus, angleUranus, uranus_tex);
-  planet(eccNeptune, sizeNeptune, angleNeptune, neptune_tex);
+  planet(distMars, sizeMars, angleMars, mars_tex);
+  planet_with_moon(distJupiter, sizeJupiter, angleJupiter, jupiter_tex,
+                   distJupiterMoon, sizeJupiterMoon, angleMoon, moon_tex);
+  planet(distUranus, sizeUranus, angleUranus, uranus_tex);
+  planet(distNeptune, sizeNeptune, angleNeptune, neptune_tex);
   asteroid();
 
   glFlush();

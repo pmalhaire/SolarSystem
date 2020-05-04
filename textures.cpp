@@ -23,12 +23,12 @@ static GLuint loadTexture(FIBITMAP *dib1) {
   FREE_IMAGE_TYPE type;
   BITMAPINFOHEADER *header;
 
-  type = FreeImage_GetImageType(dib1);
+  // type = FreeImage_GetImageType(dib1);
 
   height = FreeImage_GetHeight(dib1);
   width = FreeImage_GetWidth(dib1);
 
-  header = FreeImage_GetInfoHeader(dib1);
+  // header = FreeImage_GetInfoHeader(dib1);
   int scanLineWidh =
       ((3 * width) % 4 == 0) ? 3 * width : ((3 * width) / 4) * 4 + 4;
   unsigned char *texels =
