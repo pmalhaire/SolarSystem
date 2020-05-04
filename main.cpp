@@ -20,10 +20,12 @@ static GLfloat sizeSun = 0.2f;
 // orbit of each planet
 static GLfloat eccMercury = 0.295, eccVenus = 0.4, eccEarth = 0.5,
                eccMars = 0.6, eccJupiter = 0.8, eccSaturn = 1.0,
-               eccUranus = 1.05, eccNeptune = 1.13;
+               eccUranus = 1.05, eccNeptune = 1.13, eccEarthMoon = 0.0598,
+               eccJupiterMoon = 0.11;
 static GLfloat sizeMercury = 0.016, sizeVenus = 0.02, sizeEarth = 0.046,
                sizeMars = 0.034, sizeJupiter = 0.1, sizeSaturn = 0.08,
-               sizeUranus = 0.046, sizeNeptune = 0.04;
+               sizeUranus = 0.046, sizeNeptune = 0.04, sizeEarthMoon = 0.023,
+               sizeJupiterMoon = 0.005;
 
 static double angular = 2 * M_PI / 50;
 
@@ -117,28 +119,17 @@ static void planet(GLfloat dist, GLfloat size, GLfloat angle, GLuint tex) {
   });
 }
 
-static void earth(void) {
-  orbit(eccEarth);
-  push_pop([](void) {
-    glRotatef(angleEarth, 0.0, 1.0, -0.5);
-    glTranslatef(eccEarth, 0.0, 0.0);
-    create_sphere(sizeEarth, 50, 50, earth_tex);
-    // create satelite
-    push_pop([](void) {
-      glRotatef(angleMoon, 0.0, 0.1, 0.05);
-      glTranslatef(0.0598, 0.0, 0.0);
-      create_sphere(0.023, 50, 50, moon_tex);
-    }); // moon made
-  });   // earth made
-}
-static void mars(void) {
-  orbit(eccMars);
-  push_pop([](void) {
-    glRotatef(angleMars, 0.0, 1.0, -0.5);
-    glTranslatef(-eccMars, 0.0, 0.0);
-    create_sphere(sizeMars, 50, 50, mars_tex);
+static void planet_with_moon(GLfloat dist, GLfloat size, GLfloat angle,
+                             GLuint tex, GLfloat distMoon, GLfloat sizeMoon,
+                             GLfloat angleMoon, GLuint texMoon) {
+  planet(dist, size, angle, tex);
+  push_pop([angle, dist, distMoon, sizeMoon, angleMoon, texMoon](void) {
+    glRotatef(angle, 0.0, 1.0, -0.5);
+    glTranslatef(dist, 0.0, 0.0);
+    planet(distMoon, sizeMoon, angleMoon, texMoon);
   });
 }
+
 static void asteroid(void) {
   push_pop([](void) {
     glColor3f(3.30, 3.30, 3.30);
@@ -163,19 +154,7 @@ static void asteroid(void) {
     }
   }); // astroid made
 }
-static void jupiter(void) {
-  orbit(eccJupiter);
-  push_pop([](void) {
-    glRotatef(angleJupiter, 0.0, 1.0, -0.5);
-    glTranslatef(-eccJupiter, 0.0, 0.0);
-    create_sphere(sizeJupiter, 50, 50, jupiter_tex);
-    push_pop([](void) {
-      glRotatef(angleMoon, 1.0, -0.5, 0.0);
-      glTranslatef(0.0, 0, 0.11);
-      create_sphere(0.005, 50, 50, moon_tex);
-    }); // moon made
-  });
-}
+
 static void saturn(void) {
   orbit(eccSaturn);
   push_pop([](void) {
@@ -199,22 +178,6 @@ static void saturn(void) {
     }); // ring made
   });
 }
-static void uranus(void) {
-  orbit(eccUranus);
-  push_pop([](void) {
-    glRotatef(angleUranus, 0.0, 1.0, -0.5);
-    glTranslatef(eccUranus, 0.0, 0.0);
-    create_sphere(sizeUranus, 50, 50, uranus_tex);
-  });
-}
-static void neptune(void) {
-  orbit(eccNeptune);
-  push_pop([](void) {
-    glRotatef(angleNeptune, 0.0, 1.0, -0.5);
-    glTranslatef(-eccNeptune, 0.0, 0.0);
-    create_sphere(sizeNeptune, 50, 50, neptune_tex);
-  });
-}
 
 static void draw(void) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -226,11 +189,13 @@ static void draw(void) {
 
   planet(eccMercury, sizeMercury, angleMercury, mercury_tex);
   planet(eccVenus, sizeVenus, angleVenus, venus_tex);
-  earth();
-  mars();
-  jupiter();
-  uranus();
-  neptune();
+  planet_with_moon(eccEarth, sizeEarth, angleEarth, earth_tex, eccEarthMoon,
+                   sizeEarthMoon, angleMoon, moon_tex);
+  planet(eccMars, sizeMars, angleMars, mars_tex);
+  planet_with_moon(eccJupiter, sizeJupiter, angleJupiter, jupiter_tex,
+                   eccJupiterMoon, sizeJupiterMoon, angleMoon, moon_tex);
+  planet(eccUranus, sizeUranus, angleUranus, uranus_tex);
+  planet(eccNeptune, sizeNeptune, angleNeptune, neptune_tex);
   asteroid();
 
   glFlush();
