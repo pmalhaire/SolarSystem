@@ -44,16 +44,6 @@ static void draw(void) {
   glFlush();
 }
 
-static void update_angle(float &angle, const float change) {
-  angle += change;
-  if (angle > 360.0f) {
-    angle -= 360.0f;
-  }
-  if (angle < 0.0f) {
-    angle += 360.0f;
-  }
-}
-
 // adapt geometry to window
 static void reshape(int w, int h) {
   glLoadIdentity();
