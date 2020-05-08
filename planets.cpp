@@ -5,7 +5,10 @@
 #include <time.h>
 #include <vector>
 #include <functional>
+#ifndef EMSCRIPTEN
 #include "textures.hpp"
+#endif
+#include "sphere.h"
 
 static GLfloat angleMoon = 0.0, angleEarth = 0.0, angleAstroid = 0.0,
                angleMars = 0.0, angleMercury = 0.0, angleVenus = 0.0,
@@ -50,6 +53,7 @@ static std::vector<double> circle(const int points) {
 }
 
 static void orbit(GLfloat scale) {
+#ifndef EMSCRIPTEN
   push_pop([scale](void) {
     glColor3f(0.3f, 0.3f, 0.3f);
     glEnable(GL_LINE_SMOOTH);
@@ -65,17 +69,20 @@ static void orbit(GLfloat scale) {
     glEnd();
     glDisable(GL_LINE_SMOOTH);
   });
+#endif
 }
 
 static void create_sphere(GLdouble radius, GLint slice, GLint stacks,
                           GLuint texIdx) {
+#ifndef EMSCRIPTEN
   glEnable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, texIdx);
-  GLUquadricObj *quadric = gluNewQuadric();
-  gluQuadricTexture(quadric, true);
-  gluQuadricNormals(quadric, GLU_SMOOTH);
-  gluSphere(quadric, radius, slice, stacks);
+#endif
+  Sphere s(radius, slice, stacks, true);
+  s.draw();
+#ifndef EMSCRIPTEN
   glDisable(GL_TEXTURE_2D);
+#endif
 }
 
 static void sun(void) {
@@ -102,6 +109,7 @@ static void planet_moon(GLfloat dist, GLfloat angle, GLfloat distMoon,
 
 static void planet_ring(const GLfloat &dist, const GLfloat &angle,
                         const GLfloat &size) {
+#ifndef EMSCRIPTEN
   push_pop([&angle, &dist, &size](void) {
     glRotatef(angle, 0.0, 1.0, -0.5);
     glTranslatef(dist, 0.0, 0.0);
@@ -126,6 +134,7 @@ static void planet_ring(const GLfloat &dist, const GLfloat &angle,
       glDisable(GL_BLEND);
     });
   });
+#endif
 }
 
 static void update_angle(float &angle, const float &change) {
@@ -150,7 +159,7 @@ void update_planets() {
   update_angle(angleNeptune, 0.02f);
   update_angle(angleAstroid, 0.002f);
 }
-
+#ifndef EMSCRIPTEN
 static void load_textures() {
   load_texture("images/sun.jpg", &sun_tex);
   load_texture("images/moon.jpg", &moon_tex);
@@ -163,6 +172,7 @@ static void load_textures() {
   load_texture("images/uranus.jpg", &uranus_tex);
   load_texture("images/neptune.jpg", &neptune_tex);
 }
+#endif
 
 void draw_solar() {
   sun();
@@ -186,4 +196,8 @@ void draw_solar() {
   planet(distNeptune, sizeNeptune, angleNeptune, neptune_tex);
 }
 
-void init_solar() { load_textures(); }
+void init_solar() {
+#ifndef EMSCRIPTEN
+  load_textures();
+#endif
+}

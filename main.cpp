@@ -3,6 +3,9 @@
 #ifdef DEBUG
 #include <GL/glew.h>
 #endif
+#ifdef EMSCRIPTEN
+#include <GL/glew.h>
+#endif
 #include <GL/glut.h>
 #include <math.h>
 #include <time.h>
@@ -17,6 +20,7 @@ static int g_width = 700, g_height = 700;
 
 static void initLighting() {
   // Lighting set up
+#ifndef EMSCRIPTEN
   glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
   glEnable(GL_LIGHTING);
   glEnable(GL_LIGHT0);
@@ -32,6 +36,7 @@ static void initLighting() {
   // Set the light position
   GLfloat qaLightPosition[] = {0.0, 0.0, 0.0, 1.0};
   glLightfv(GL_LIGHT0, GL_POSITION, qaLightPosition);
+#endif
 }
 
 static void draw(void) {
@@ -123,8 +128,9 @@ static void keyPressed(unsigned char key, int, int) {
 
 static void update(const int) {
   update_planets();
-
+#ifndef EMSCRIPTEN
   glutPostRedisplay();
+#endif
   glutTimerFunc(20, update, 0);
 }
 
@@ -149,6 +155,9 @@ int main(int argc, char **argv) {
   glewInit();
   glEnable(GL_DEBUG_OUTPUT);
   glDebugMessageCallback(MessageCallback, 0);
+#endif
+#ifdef EMSCRIPTEN
+  glewInit();
 #endif
   init_solar();
   initLighting();

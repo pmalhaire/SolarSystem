@@ -1,3 +1,4 @@
+#ifndef EMSCRIPTEN
 #include <stdio.h>
 #include "textures.hpp"
 
@@ -59,3 +60,4 @@ void load_texture(const char *path, GLuint *idx) {
   *idx = loadTexture(img);
   FreeImage_Unload(img);
 }
+#endif
