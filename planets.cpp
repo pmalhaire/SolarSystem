@@ -23,18 +23,21 @@ struct planet {
 
 static int step = 0;
 
+// set orbital speed using https://www.sjsu.edu/faculty/watkins/orbital.htm
+const double baseSpeed = 2.0 * M_PI / 360.0;
+
 static std::map<const std::string, struct planet> planets{
     {"sun", {0.0, 0.2, 0.0, 0}},
-    {"mercury", {0.295, 0.016, 0.20, 0}},
-    {"venus", {0.4, 0.02, 0.09, 0}},
-    {"earth", {0.5, 0.046, 0.07, 0}},
+    {"mercury", {0.295, 0.016, baseSpeed * 1.607, 0}},
+    {"venus", {0.4, 0.02, baseSpeed * 1.174, 0}},
+    {"earth", {0.5, 0.046, baseSpeed, 0}},
     {"earthMoon", {0.0598, 0.023, 0.20, 0}},
-    {"mars", {0.6, 0.034, 0.05, 0}},
-    {"jupiter", {0.8, 0.1, 0.02, 0}},
+    {"mars", {0.6, 0.034, baseSpeed * 0.802, 0}},
+    {"jupiter", {0.8, 0.1, baseSpeed * 0.434, 0}},
     {"jupiterMoon", {0.11, 0.005, 0.2, 0}},
-    {"saturn", {1.0, 0.08, 0.01, 0}},
-    {"uranus", {1.05, 0.046, 0.005, 0}},
-    {"neptune", {1.13, 0.04, 0.002, 0}}};
+    {"saturn", {1.0, 0.08, baseSpeed * 0.323, 0}},
+    {"uranus", {1.05, 0.046, baseSpeed * 0.228, 0}},
+    {"neptune", {1.13, 0.04, baseSpeed * 0.182, 0}}};
 
 static GLfloat sizeSaturnRing = 0.14f;
 
