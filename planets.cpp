@@ -7,15 +7,16 @@
 #include <map>
 #include <functional>
 #include "textures.hpp"
+#include "sphere.h"
 
 struct position {
   GLdouble x, y, z;
 };
 
 struct planet {
-  GLfloat dist;
+  GLdouble dist;
   GLdouble size;
-  GLfloat angleStep;
+  GLdouble angleStep;
   GLuint tex;
   struct position pos;
 };
@@ -23,17 +24,17 @@ struct planet {
 static int step = 0;
 
 static std::map<const std::string, struct planet> planets{
-    {"sun", {0.0f, 0.2, 0.0, 0}},
-    {"mercury", {0.295f, 0.016, 0.20f, 0}},
-    {"venus", {0.4f, 0.02, 0.09f, 0}},
-    {"earth", {0.5f, 0.046, 0.07f, 0}},
-    {"earthMoon", {0.0598f, 0.023, 0.20f, 0}},
-    {"mars", {0.6f, 0.034, 0.05f, 0}},
-    {"jupiter", {0.8f, 0.1, 0.02f, 0}},
-    {"jupiterMoon", {0.11f, 0.005, 0.2f, 0}},
-    {"saturn", {1.0f, 0.08, 0.01f, 0}},
-    {"uranus", {1.05f, 0.046, 0.005f, 0}},
-    {"neptune", {1.13f, 0.04, 0.002f, 0}}};
+    {"sun", {0.0, 0.2, 0.0, 0}},
+    {"mercury", {0.295, 0.016, 0.20, 0}},
+    {"venus", {0.4, 0.02, 0.09, 0}},
+    {"earth", {0.5, 0.046, 0.07, 0}},
+    {"earthMoon", {0.0598, 0.023, 0.20, 0}},
+    {"mars", {0.6, 0.034, 0.05, 0}},
+    {"jupiter", {0.8, 0.1, 0.02, 0}},
+    {"jupiterMoon", {0.11, 0.005, 0.2, 0}},
+    {"saturn", {1.0, 0.08, 0.01, 0}},
+    {"uranus", {1.05, 0.046, 0.005, 0}},
+    {"neptune", {1.13, 0.04, 0.002, 0}}};
 
 static GLfloat sizeSaturnRing = 0.14f;
 
@@ -77,31 +78,29 @@ static void create_sphere(GLdouble radius, GLint slice, GLint stacks,
                           GLuint texIdx) {
   glEnable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, texIdx);
-  GLUquadricObj *quadric = gluNewQuadric();
-  gluQuadricTexture(quadric, true);
-  gluQuadricNormals(quadric, GLU_SMOOTH);
-  gluSphere(quadric, radius, slice, stacks);
+  Sphere s(radius, slice, stacks, true);
+  s.draw();
   glDisable(GL_TEXTURE_2D);
 }
 
 static void planet(const struct planet &p) {
   orbit(p.dist);
   push_pop([&p](void) {
-    glTranslatef(p.pos.x, p.pos.y, p.pos.z);
+    glTranslated(p.pos.x, p.pos.y, p.pos.z);
     create_sphere(p.size, 50, 50, p.tex);
   });
 }
 
 static void planet_moon(const struct planet &p, const struct planet &moon) {
   push_pop([&p, &moon](void) {
-    glTranslatef(p.pos.x, p.pos.y, p.pos.z);
+    glTranslated(p.pos.x, p.pos.y, p.pos.z);
     planet(moon);
   });
 }
 
 static void planet_ring(const struct planet &p, GLfloat &sizeRing) {
   push_pop([&p, &sizeRing](void) {
-    glTranslatef(p.pos.x, p.pos.y, p.pos.z);
+    glTranslated(p.pos.x, p.pos.y, p.pos.z);
     push_pop([&p, &sizeRing](void) {
       glEnable(GL_BLEND);
       glEnable(GL_COLOR_MATERIAL);
