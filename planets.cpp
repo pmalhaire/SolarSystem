@@ -145,20 +145,14 @@ static void update_planets() {
     angleAsteroid += 360.0f;
   }
 }
+static void
+load_planet_texture(std::pair<const std::string, struct planet> &p) {
+  load_texture("images/" + p.first + ".jpg", &p.second.tex);
+}
 
 static void load_textures() {
-  load_texture("images/sun.jpg", &planets["sun"].tex);
 
-  load_texture("images/mercury.jpg", &planets["mercury"].tex);
-  load_texture("images/venus.jpg", &planets["venus"].tex);
-  load_texture("images/earth.jpg", &planets["earth"].tex);
-  load_texture("images/moon.jpg", &planets["earthMoon"].tex);
-  load_texture("images/mars.jpg", &planets["mars"].tex);
-  load_texture("images/jupiter.jpg", &planets["jupiter"].tex);
-  load_texture("images/moon.jpg", &planets["jupiterMoon"].tex);
-  load_texture("images/saturn.jpg", &planets["saturn"].tex);
-  load_texture("images/uranus.jpg", &planets["uranus"].tex);
-  load_texture("images/neptune.jpg", &planets["neptune"].tex);
+  std::for_each(planets.begin(), planets.end(), load_planet_texture);
 }
 
 void draw_solar() {

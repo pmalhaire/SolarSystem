@@ -2,5 +2,6 @@
 #define TEXTURES_HPP
 #include <FreeImage.h>
 #include <GL/glut.h>
-void load_texture(const char *path, GLuint *idx);
+#include <string>
+void load_texture(const std::string &path, GLuint *idx);
 #endif

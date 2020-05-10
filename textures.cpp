@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string>
 #include "textures.hpp"
 
 static FIBITMAP *loadImage(const char *filename) {
@@ -54,8 +55,8 @@ static GLuint loadTexture(FIBITMAP *dib1) {
   return tex_id;
 }
 
-void load_texture(const char *path, GLuint *idx) {
-  FIBITMAP *img = loadImage(path);
+void load_texture(const std::string &path, GLuint *idx) {
+  FIBITMAP *img = loadImage(path.c_str());
   *idx = loadTexture(img);
   FreeImage_Unload(img);
 }
