@@ -1,3 +1,3 @@
 void draw_solar();
 void init_solar();
-void update_planets();
+void update_solar();

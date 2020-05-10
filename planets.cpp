@@ -4,31 +4,33 @@
 #include <math.h>
 #include <time.h>
 #include <vector>
+#include <map>
 #include <functional>
 #include "textures.hpp"
 
-static GLfloat angleMoon = 0.0, angleEarth = 0.0, angleAstroid = 0.0,
-               angleMars = 0.0, angleMercury = 0.0, angleVenus = 0.0,
-               angleJupiter = 0.0, angleSaturn = 0.0, angleUranus = 30.0,
-               angleNeptune = 60.0;
+struct planet {
+  GLfloat dist;
+  GLdouble size;
+  GLfloat angle;
+  GLfloat angleStep;
+  GLuint tex;
+};
 
-// scale for sun
-static GLdouble sizeSun = 0.2;
-
-// orbit of each planet
-static GLfloat distMercury = 0.295f, distVenus = 0.4f, distEarth = 0.5f,
-               distMars = 0.6f, distJupiter = 0.8f, distSaturn = 1.0f,
-               distUranus = 1.05f, distNeptune = 1.13f, distEarthMoon = 0.0598f,
-               distJupiterMoon = 0.11f;
-static GLdouble sizeMercury = 0.016, sizeVenus = 0.02, sizeEarth = 0.046,
-                sizeMars = 0.034, sizeJupiter = 0.1, sizeSaturn = 0.08,
-                sizeUranus = 0.046, sizeNeptune = 0.04, sizeEarthMoon = 0.023,
-                sizeJupiterMoon = 0.005;
+static std::map<const std::string, struct planet> planets{
+    {"sun", {0.0f, 0.2, 0.0f, 0}},
+    {"mercury", {0.295f, 0.016, 0.0, 2.0f, 0}},
+    {"venus", {0.4f, 0.02, 0.0f, 0.9f, 0}},
+    {"earth", {0.5f, 0.046, 0.0f, 0.7f, 0}},
+    {"earthMoon", {0.0598f, 0.023, 0.0f, 2.0f, 0}},
+    {"mars", {0.6f, 0.034, 0.0f, 0.5f, 0}},
+    {"jupiter", {0.8f, 0.1, 0.0f, 0.2f, 0}},
+    {"jupiterMoon", {0.11f, 0.005, 0.0f, 0.2f, 0}},
+    {"saturn", {1.0f, 0.08, 0.0f, 0.1f, 0}},
+    {"uranus", {1.05f, 0.046, 0.0f, 0.05f, 0}},
+    {"neptune", {1.13f, 0.04, 0.0f, 0.02f, 0}}};
 
 static GLfloat sizeSaturnRing = 0.16f;
-
-static GLuint sun_tex, moon_tex, earth_tex, mercury_tex, venus_tex, mars_tex,
-    jupiter_tex, saturn_tex, uranus_tex, neptune_tex;
+static GLfloat angleAsteroid = 0.0f;
 
 static void push_pop(std::function<void()> action) {
   glPushMatrix();
@@ -78,39 +80,33 @@ static void create_sphere(GLdouble radius, GLint slice, GLint stacks,
   glDisable(GL_TEXTURE_2D);
 }
 
-static void sun(void) {
-  push_pop([](void) { create_sphere(sizeSun, 50, 50, sun_tex); });
-}
-
-static void planet(GLfloat dist, GLdouble size, GLfloat angle, GLuint tex) {
-  orbit(dist);
-  push_pop([&angle, &dist, &size, &tex](void) {
-    glRotatef(angle, 0.0, 1.0, -0.5);
-    glTranslatef(dist, 0.0, 0.0);
-    create_sphere(size, 50, 50, tex);
+static void planet(const struct planet &p) {
+  orbit(p.dist);
+  push_pop([&p](void) {
+    glRotatef(p.angle, 0.0, 1.0, -0.5);
+    glTranslatef(p.dist, 0.0, 0.0);
+    create_sphere(p.size, 50, 50, p.tex);
   });
 }
 
-static void planet_moon(GLfloat dist, GLfloat angle, GLfloat distMoon,
-                        GLdouble sizeMoon, GLfloat planetMoon, GLuint texMoon) {
-  push_pop([&angle, &dist, &distMoon, &sizeMoon, &planetMoon, &texMoon](void) {
-    glRotatef(angle, 0.0, 1.0, -0.5);
-    glTranslatef(dist, 0.0, 0.0);
-    planet(distMoon, sizeMoon, planetMoon, texMoon);
+static void planet_moon(const struct planet &p, const struct planet &moon) {
+  push_pop([&p, &moon](void) {
+    glRotatef(p.angle, 0.0, 1.0, -0.5);
+    glTranslatef(p.dist, 0.0, 0.0);
+    planet(moon);
   });
 }
 
-static void planet_ring(const GLfloat &dist, const GLfloat &angle,
-                        const GLfloat &size) {
-  push_pop([&angle, &dist, &size](void) {
-    glRotatef(angle, 0.0, 1.0, -0.5);
-    glTranslatef(dist, 0.0, 0.0);
-    push_pop([&size](void) {
+static void planet_ring(const struct planet &p, GLfloat &sizeRing) {
+  push_pop([&p, &sizeRing](void) {
+    glRotatef(p.angle, 0.0, 1.0, -0.5);
+    glTranslatef(p.dist, 0.0, 0.0);
+    push_pop([&p, &sizeRing](void) {
       glEnable(GL_BLEND);
       glEnable(GL_COLOR_MATERIAL);
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       glRotatef(45.0f, 1.0f, 0.0f, 0.0f);
-      glScalef(size, size, size);
+      glScalef(sizeRing, sizeRing, sizeRing);
       glBegin(GL_TRIANGLE_FAN);
       const float alpha = 0.2f;
       // todo make a better way to set alpha
@@ -128,62 +124,64 @@ static void planet_ring(const GLfloat &dist, const GLfloat &angle,
   });
 }
 
-static void update_angle(float &angle, const float &change) {
-  angle += change;
-  if (angle > 360.0f) {
-    angle -= 360.0f;
+static void update_angle(std::pair<const std::string, struct planet> &p) {
+  p.second.angle += p.second.angleStep;
+  if (p.second.angle > 360.0f) {
+    p.second.angle -= 360.0f;
   }
-  if (angle < 0.0f) {
-    angle += 360.0f;
+  if (p.second.angle < 0.0f) {
+    p.second.angle += 360.0f;
   }
 }
 
-void update_planets() {
-  update_angle(angleMoon, 2.0f);
-  update_angle(angleEarth, 0.7f);
-  update_angle(angleMercury, 2.0f);
-  update_angle(angleVenus, 0.9f);
-  update_angle(angleMars, 0.5f);
-  update_angle(angleJupiter, 0.2f);
-  update_angle(angleSaturn, 0.1f);
-  update_angle(angleUranus, 0.05f);
-  update_angle(angleNeptune, 0.02f);
-  update_angle(angleAstroid, 0.002f);
+static void update_planets() {
+  std::for_each(planets.begin(), planets.end(), update_angle);
+
+  angleAsteroid += 0.002f;
+  if (angleAsteroid > 360.0f) {
+    angleAsteroid -= 360.0f;
+  }
+  if (angleAsteroid < 0.0f) {
+    angleAsteroid += 360.0f;
+  }
 }
 
 static void load_textures() {
-  load_texture("images/sun.jpg", &sun_tex);
-  load_texture("images/moon.jpg", &moon_tex);
-  load_texture("images/earth.jpg", &earth_tex);
-  load_texture("images/mercury.jpg", &mercury_tex);
-  load_texture("images/venus.jpg", &venus_tex);
-  load_texture("images/mars.jpg", &mars_tex);
-  load_texture("images/jupiter.jpg", &jupiter_tex);
-  load_texture("images/saturn.jpg", &saturn_tex);
-  load_texture("images/uranus.jpg", &uranus_tex);
-  load_texture("images/neptune.jpg", &neptune_tex);
+  load_texture("images/sun.jpg", &planets["sun"].tex);
+
+  load_texture("images/mercury.jpg", &planets["mercury"].tex);
+  load_texture("images/venus.jpg", &planets["venus"].tex);
+  load_texture("images/earth.jpg", &planets["earth"].tex);
+  load_texture("images/moon.jpg", &planets["earthMoon"].tex);
+  load_texture("images/mars.jpg", &planets["mars"].tex);
+  load_texture("images/jupiter.jpg", &planets["jupiter"].tex);
+  load_texture("images/moon.jpg", &planets["jupiterMoon"].tex);
+  load_texture("images/saturn.jpg", &planets["saturn"].tex);
+  load_texture("images/uranus.jpg", &planets["uranus"].tex);
+  load_texture("images/neptune.jpg", &planets["neptune"].tex);
 }
 
 void draw_solar() {
-  sun();
 
-  planet(distMercury, sizeMercury, angleMercury, mercury_tex);
-  planet(distVenus, sizeVenus, angleVenus, venus_tex);
+  planet(planets["sun"]);
 
-  planet(distEarth, sizeEarth, angleEarth, earth_tex);
-  planet_moon(distEarth, angleEarth, distEarthMoon, sizeEarthMoon, angleMoon,
-              moon_tex);
-  planet(distMars, sizeMars, angleMars, mars_tex);
+  planet(planets["mercury"]);
+  planet(planets["venus"]);
 
-  planet(distJupiter, sizeJupiter, angleJupiter, jupiter_tex);
-  planet_moon(distJupiter, angleJupiter, distJupiterMoon, sizeJupiterMoon,
-              angleMoon, moon_tex);
+  planet(planets["earth"]);
+  planet_moon(planets["earth"], planets["earthMoon"]);
 
-  planet(distSaturn, sizeSaturn, angleSaturn, saturn_tex);
-  planet_ring(distSaturn, angleSaturn, sizeSaturnRing);
+  planet(planets["mars"]);
 
-  planet(distUranus, sizeUranus, angleUranus, uranus_tex);
-  planet(distNeptune, sizeNeptune, angleNeptune, neptune_tex);
+  planet(planets["jupiter"]);
+  planet_moon(planets["jupiter"], planets["jupiterMoon"]);
+
+  planet(planets["saturn"]);
+  planet_ring(planets["saturn"], sizeSaturnRing);
+
+  planet(planets["uranus"]);
+  planet(planets["neptune"]);
 }
 
 void init_solar() { load_textures(); }
+void update_solar() { update_planets(); }

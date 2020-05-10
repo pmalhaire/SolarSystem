@@ -122,7 +122,7 @@ static void keyPressed(unsigned char key, int, int) {
 }
 
 static void update(const int) {
-  update_planets();
+  update_solar();
 
   glutPostRedisplay();
   glutTimerFunc(20, update, 0);
