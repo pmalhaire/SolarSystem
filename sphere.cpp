@@ -94,7 +94,6 @@ void Sphere::printSelf() const {
 // OpenGL RC must be set before calling it
 ///////////////////////////////////////////////////////////////////////////////
 void Sphere::draw() const {
-#ifndef EMSCRIPTEN
   // interleaved array
   glEnableClientState(GL_VERTEX_ARRAY);
   glEnableClientState(GL_NORMAL_ARRAY);
@@ -102,31 +101,13 @@ void Sphere::draw() const {
   glVertexPointer(3, GL_FLOAT, interleavedStride, &interleavedVertices[0]);
   glNormalPointer(GL_FLOAT, interleavedStride, &interleavedVertices[3]);
   glTexCoordPointer(2, GL_FLOAT, interleavedStride, &interleavedVertices[6]);
-#endif
-#ifdef EMSCRIPTEN
-  // Load the vertex data
-  GLuint vbo = 0;
-  glGenBuffers(1, &vbo);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, (unsigned int)vertices.size() * sizeof(float),
-               vertices.data(), GL_STATIC_DRAW);
 
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-  glEnableVertexAttribArray(0);
-
-  glDrawArrays(GL_POINTS, 0, static_cast<int>(getVertexCount()));
-
-  glDisableVertexAttribArray(0);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glDeleteBuffers(1, &vbo);
-#else
   glDrawElements(GL_TRIANGLES, (unsigned int)indices.size(), GL_UNSIGNED_INT,
                  indices.data());
 
   glDisableClientState(GL_VERTEX_ARRAY);
   glDisableClientState(GL_NORMAL_ARRAY);
   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
