@@ -67,7 +67,7 @@ static void orbit(GLfloat scale) {
     glScalef(scale, scale, scale);
     glBegin(GL_LINE_LOOP);
 
-    static const int points = 50;
+    static const int points = 100;
     auto vertices = circle(points);
     for (unsigned long j = 0; j < 2 * points; j += 2) {
       glVertex2d(vertices[j], vertices[j + 1]);
