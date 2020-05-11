@@ -64,6 +64,7 @@ static void specialKey(int key, int, int) {
     if (angleX > 2 * M_PI) {
       angleX -= 2 * M_PI;
     }
+    eyeX = 0.0;
     eyeY = 15.0 * cos(angleX);
     eyeZ = 15.0 * sin(angleX);
     break;
@@ -72,6 +73,7 @@ static void specialKey(int key, int, int) {
     if (angleX < 0.0) {
       angleX += 2 * M_PI;
     }
+    eyeX = 0.0;
     eyeY = 15.0 * cos(angleX);
     eyeZ = 15.0 * sin(angleX);
     break;
@@ -81,6 +83,7 @@ static void specialKey(int key, int, int) {
       angleY -= 2 * M_PI;
     }
     eyeX = 15.0 * cos(angleY);
+    eyeY = 0.0;
     eyeZ = 15.0 * sin(angleY);
     break;
   case GLUT_KEY_RIGHT:
@@ -89,6 +92,7 @@ static void specialKey(int key, int, int) {
       angleY += 2 * M_PI;
     }
     eyeX = 15.0 * cos(angleY);
+    eyeY = 0.0;
     eyeZ = 15.0 * sin(angleY);
     break;
   default:
